@@ -31,7 +31,7 @@ export default function VoucherManager() {
       const { data, error } = await supabase
         .from('vouchers')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('code', { ascending: true });
       
       if (error) throw error;
       setVouchers(data || []);

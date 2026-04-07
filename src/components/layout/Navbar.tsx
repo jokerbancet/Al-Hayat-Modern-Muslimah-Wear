@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingBag, Search, Menu, X, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { Category } from '../../types';
@@ -51,25 +52,7 @@ export default function Navbar({ onCartClick, cartCount, categories }: NavbarPro
       <div className="container mx-auto px-6 flex items-center justify-between">
         <div className="flex-1 hidden md:flex items-center gap-6 overflow-x-auto no-scrollbar">
           {leftLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="text-[10px] font-bold tracking-widest uppercase hover:text-secondary transition-colors whitespace-nowrap"
-            >
-              {link.name}
-            </a>
-          ))}
-        </div>
-
-        <div className="flex-shrink-0 px-8">
-          <a href="/" className="text-2xl md:text-3xl font-serif font-bold tracking-tighter">
-            AL-HAYAT
-          </a>
-        </div>
-
-        <div className="flex-1 flex items-center justify-end gap-6">
-          <div className="hidden md:flex items-center gap-6 overflow-x-auto no-scrollbar">
-            {rightLinks.map((link) => (
+            link.href.startsWith('#') ? (
               <a
                 key={link.name}
                 href={link.href}
@@ -77,6 +60,44 @@ export default function Navbar({ onCartClick, cartCount, categories }: NavbarPro
               >
                 {link.name}
               </a>
+            ) : (
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-[10px] font-bold tracking-widest uppercase hover:text-secondary transition-colors whitespace-nowrap"
+              >
+                {link.name}
+              </Link>
+            )
+          ))}
+        </div>
+
+        <div className="flex-shrink-0 px-8">
+          <Link to="/" className="text-2xl md:text-3xl font-serif font-bold tracking-tighter">
+            AL-HAYAT
+          </Link>
+        </div>
+
+        <div className="flex-1 flex items-center justify-end gap-6">
+          <div className="hidden md:flex items-center gap-6 overflow-x-auto no-scrollbar">
+            {rightLinks.map((link) => (
+              link.href.startsWith('#') ? (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="text-[10px] font-bold tracking-widest uppercase hover:text-secondary transition-colors whitespace-nowrap"
+                >
+                  {link.name}
+                </a>
+              ) : (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-[10px] font-bold tracking-widest uppercase hover:text-secondary transition-colors whitespace-nowrap"
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
           </div>
           
@@ -112,13 +133,23 @@ export default function Navbar({ onCartClick, cartCount, categories }: NavbarPro
               <SheetContent side="right" className="w-full sm:w-[350px] bg-background overflow-y-auto">
                 <div className="flex flex-col gap-6 mt-12">
                   {allLinks.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.href}
-                      className="text-xl font-serif font-medium hover:text-secondary transition-colors"
-                    >
-                      {link.name}
-                    </a>
+                    link.href.startsWith('#') ? (
+                      <a
+                        key={link.name}
+                        href={link.href}
+                        className="text-xl font-serif font-medium hover:text-secondary transition-colors"
+                      >
+                        {link.name}
+                      </a>
+                    ) : (
+                      <Link
+                        key={link.name}
+                        to={link.href}
+                        className="text-xl font-serif font-medium hover:text-secondary transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    )
                   ))}
                   <button 
                     onClick={toggleLanguage}

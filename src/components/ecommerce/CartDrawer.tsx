@@ -12,8 +12,8 @@ interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
-  onUpdateQuantity: (id: string, delta: number) => void;
-  onRemove: (id: string) => void;
+  onUpdateQuantity: (id: string, size: string, color: string, delta: number) => void;
+  onRemove: (id: string, size: string, color: string) => void;
 }
 
 export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, onRemove }: CartDrawerProps) {
@@ -56,8 +56,9 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
             <div className="space-y-12">
               {items.map((item) => {
                 const itemName = item.name;
+                const itemKey = `${item.id}-${item.selectedSize}-${item.selectedColor}`;
                 return (
-                  <div key={item.id} className="flex gap-6 group">
+                  <div key={itemKey} className="flex gap-6 group">
                     <div className="w-24 aspect-[3/4] bg-muted overflow-hidden shrink-0">
                       <img
                         src={item.image}
@@ -73,7 +74,7 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
                             {itemName}
                           </h4>
                           <button
-                            onClick={() => onRemove(item.id)}
+                            onClick={() => onRemove(item.id, item.selectedSize, item.selectedColor)}
                             className="text-muted-foreground hover:text-destructive transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -87,7 +88,7 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
                       <div className="flex justify-between items-center">
                         <div className="flex items-center border rounded-none">
                           <button
-                            onClick={() => onUpdateQuantity(item.id, -1)}
+                            onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.selectedColor, -1)}
                             className="p-2 hover:bg-muted transition-colors"
                             disabled={item.quantity <= 1}
                           >
@@ -95,7 +96,7 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
                           </button>
                           <span className="w-8 text-center text-xs font-bold">{item.quantity}</span>
                           <button
-                            onClick={() => onUpdateQuantity(item.id, 1)}
+                            onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.selectedColor, 1)}
                             className="p-2 hover:bg-muted transition-colors"
                           >
                             <Plus className="w-3 h-3" />

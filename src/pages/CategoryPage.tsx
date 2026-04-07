@@ -1,12 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ShoppingBag, Plus, Minus, Loader2, ArrowRight } from 'lucide-react';
+import { 
+  ChevronLeft, 
+  ShoppingBag, 
+  Plus, 
+  Minus, 
+  Loader2, 
+  ArrowRight, 
+  LayoutGrid, 
+  List, 
+  ChevronDown,
+  Filter,
+  X
+} from 'lucide-react';
+import * as Slider from '@radix-ui/react-slider';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as Checkbox from '@radix-ui/react-checkbox';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../components/ui/sheet';
 import { supabase } from '../lib/supabase';
 import { Category, Product, CartItem } from '../types';
 import { toast } from 'sonner';
+import { formatCurrency } from '../lib/utils';
 
 interface CategoryPageProps {
   onAddToCart: (item: CartItem) => void;
@@ -18,6 +35,12 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
   const [category, setCategory] = useState<Category | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Filter States
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortBy, setSortBy] = useState<'newest' | 'price-low' | 'price-high'>('newest');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
+  const [availability, setAvailability] = useState<string[]>(['in-stock', 'out-of-stock']);
 
   useEffect(() => {
     if (slug) {
@@ -46,11 +69,16 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
           images:product_images(*),
           variants:variants!variants_product_id_fkey(*)
         `)
-        .eq('category_id', catData.id)
-        .order('created_at', { ascending: false });
+        .eq('category_id', catData.id);
 
       if (prodError) throw prodError;
       setProducts(prodData || []);
+      
+      // Set initial price range based on products
+      if (prodData && prodData.length > 0) {
+        const prices = prodData.map(p => p.base_price);
+        setPriceRange([0, Math.max(...prices)]);
+      }
     } catch (error: any) {
       console.error('Error fetching category data:', error);
       toast.error('Category not found');
@@ -59,6 +87,34 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
       setLoading(false);
     }
   };
+
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    // Filter by Availability
+    result = result.filter(p => {
+      const totalStock = p.variants?.reduce((sum, v) => sum + v.stock_quantity, 0) || 0;
+      const status = totalStock > 0 ? 'in-stock' : 'out-of-stock';
+      return availability.includes(status);
+    });
+
+    // Filter by Price
+    result = result.filter(p => p.base_price >= priceRange[0] && p.base_price <= priceRange[1]);
+
+    // Sort
+    if (sortBy === 'newest') {
+      result.sort((a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime());
+    } else if (sortBy === 'price-low') {
+      result.sort((a, b) => a.base_price - b.base_price);
+    } else if (sortBy === 'price-high') {
+      result.sort((a, b) => b.base_price - a.base_price);
+    }
+
+    return result;
+  }, [products, availability, priceRange, sortBy]);
+
+  const inStockCount = products.filter(p => (p.variants?.reduce((sum, v) => sum + v.stock_quantity, 0) || 0) > 0).length;
+  const outOfStockCount = products.length - inStockCount;
 
   if (loading) {
     return (
@@ -75,228 +131,372 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-background pt-32 pb-24"
+      className="min-h-screen bg-[#FDFCFB] pt-32 pb-24"
     >
       <div className="container mx-auto px-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-20">
-          <div className="space-y-6 max-w-2xl">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
-              className="p-0 h-auto hover:bg-transparent text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 group"
-            >
-              <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span className="text-[10px] font-bold tracking-widest uppercase">Back to Collections</span>
-            </Button>
-            <div className="space-y-4">
-              <h1 className="text-6xl md:text-8xl font-serif font-bold tracking-tight leading-none">
-                {category.name.split(' ')[0]} <br />
-                <span className="italic text-secondary">{category.name.split(' ').slice(1).join(' ') || 'Collection'}</span>
-              </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                {category.description || `Explore our curated selection of ${category.name}, designed with timeless elegance and modern sophistication.`}
-              </p>
-            </div>
-          </div>
-          
-          {category.image_url && (
-            <div className="w-full md:w-72 aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700">
-              <img src={category.image_url} alt={category.name} className="w-full h-full object-cover" />
-            </div>
-          )}
+        <div className="text-center mb-16 space-y-4">
+          <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight uppercase">
+            {category.name}
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto italic">
+            {category.description || `A curated collection of ${category.name} for the modern wardrobe.`}
+          </p>
         </div>
 
-        {/* Product Menu List */}
-        <div className="space-y-8">
-          <div className="flex items-center gap-4 mb-12">
-            <div className="h-px flex-1 bg-primary/10" />
-            <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-muted-foreground">The Menu</span>
-            <div className="h-px flex-1 bg-primary/10" />
+        {/* Toolbar */}
+        <div className="border-y border-primary/10 py-4 mb-12 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setViewMode('grid')}
+              className={`p-2 transition-colors ${viewMode === 'grid' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            >
+              <LayoutGrid className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setViewMode('list')}
+              className={`p-2 transition-colors ${viewMode === 'list' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            >
+              <List className="w-5 h-5" />
+            </button>
+            
+            {/* Mobile Filter Trigger */}
+            <div className="lg:hidden ml-2">
+              <Sheet>
+                <SheetTrigger 
+                  render={
+                    <Button variant="ghost" size="sm" className="text-[10px] font-bold tracking-widest uppercase gap-2">
+                      <Filter className="w-4 h-4" />
+                      Filters
+                    </Button>
+                  }
+                />
+                <SheetContent side="left" className="w-full sm:w-[400px] p-0 bg-background border-none">
+                  <SheetHeader className="p-8 border-b">
+                    <SheetTitle className="text-2xl font-serif font-bold tracking-tight">Filters</SheetTitle>
+                  </SheetHeader>
+                  <div className="p-8">
+                    <FilterSidebar 
+                      availability={availability}
+                      setAvailability={setAvailability}
+                      priceRange={priceRange}
+                      setPriceRange={setPriceRange}
+                      inStockCount={inStockCount}
+                      outOfStockCount={outOfStockCount}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
-            {products.map((product) => (
-              <ProductMenuItem key={product.id} product={product} onAddToCart={onAddToCart} />
-            ))}
+          <div className="flex items-center gap-6">
+            <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+              {filteredProducts.length} Products
+            </span>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="text-[10px] font-bold tracking-widest uppercase flex items-center gap-2 text-primary hover:text-secondary transition-colors">
+                  Sort: {sortBy === 'newest' ? 'Newest' : sortBy === 'price-low' ? 'Price: Low to High' : 'Price: High to Low'}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className="bg-white border p-2 rounded-xl shadow-xl z-50 min-w-[200px] animate-in fade-in zoom-in-95 duration-200">
+                  <DropdownMenu.Item 
+                    onClick={() => setSortBy('newest')}
+                    className="text-[10px] font-bold tracking-widest uppercase p-3 hover:bg-muted rounded-lg cursor-pointer outline-none"
+                  >
+                    Newest
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item 
+                    onClick={() => setSortBy('price-low')}
+                    className="text-[10px] font-bold tracking-widest uppercase p-3 hover:bg-muted rounded-lg cursor-pointer outline-none"
+                  >
+                    Price: Low to High
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item 
+                    onClick={() => setSortBy('price-high')}
+                    className="text-[10px] font-bold tracking-widest uppercase p-3 hover:bg-muted rounded-lg cursor-pointer outline-none"
+                  >
+                    Price: High to Low
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
           </div>
-          
-          {products.length === 0 && (
-            <div className="text-center py-32 space-y-4">
-              <p className="text-muted-foreground italic">No products found in this category yet.</p>
-              <Button onClick={() => navigate('/')} variant="outline" className="rounded-full px-8">
-                Explore Other Collections
-              </Button>
+        </div>
+
+        <div className="flex gap-12">
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:block w-64 shrink-0 space-y-12">
+            <FilterSidebar 
+              availability={availability}
+              setAvailability={setAvailability}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              inStockCount={inStockCount}
+              outOfStockCount={outOfStockCount}
+            />
+          </aside>
+
+          {/* Product Grid */}
+          <div className="flex-1">
+            <div className={`grid gap-x-8 gap-y-16 ${
+              viewMode === 'grid' 
+                ? 'grid-cols-2 md:grid-cols-3 xl:grid-cols-4' 
+                : 'grid-cols-1'
+            }`}>
+              {filteredProducts.map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  viewMode={viewMode}
+                  onAddToCart={onAddToCart}
+                />
+              ))}
             </div>
-          )}
+            
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-24 space-y-4">
+                <p className="text-xl font-serif font-bold">No products found</p>
+                <p className="text-sm text-muted-foreground">Try adjusting your filters to find what you're looking for.</p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setPriceRange([0, 5000000]);
+                    setAvailability(['in-stock', 'out-of-stock']);
+                  }}
+                  className="rounded-full"
+                >
+                  Clear All Filters
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
   );
 }
 
-function ProductMenuItem({ product, onAddToCart }: { product: Product; onAddToCart: (item: CartItem) => void }) {
-  const [selectedSize, setSelectedSize] = useState<string>('');
-  const [selectedColor, setSelectedColor] = useState<string>('');
-  const [quantity, setQuantity] = useState(1);
-
-  const colors = Array.from(new Set(product.variants?.map(v => v.color_option) || []));
-  const sizes = Array.from(new Set(product.variants?.map(v => v.size_option) || []));
-
-  const currentVariant = product.variants?.find(
-    v => v.color_option === selectedColor && v.size_option === selectedSize
-  );
-
-  const total = product.base_price * quantity;
-
-  const handleAddToCart = () => {
-    if (!selectedSize || !selectedColor) {
-      toast.error('Please select both size and color');
-      return;
-    }
-
-    onAddToCart({
-      id: product.id,
-      name: product.name,
-      price: product.base_price,
-      image: product.images?.[0]?.image_url || '',
-      variantId: currentVariant?.id || '',
-      selectedSize,
-      selectedColor,
-      quantity
-    });
-    
-    toast.success(`${product.name} added to cart`);
+function FilterSidebar({ 
+  availability, 
+  setAvailability, 
+  priceRange, 
+  setPriceRange,
+  inStockCount,
+  outOfStockCount
+}: any) {
+  const toggleAvailability = (value: string) => {
+    setAvailability((prev: string[]) => 
+      prev.includes(value) 
+        ? prev.filter(v => v !== value) 
+        : [...prev, value]
+    );
   };
 
   return (
-    <div className="group bg-white border border-primary/5 rounded-3xl p-6 md:p-8 hover:shadow-xl hover:border-secondary/30 transition-all duration-500">
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Image */}
-        <div className="w-full lg:w-48 aspect-square rounded-2xl overflow-hidden bg-muted shrink-0">
-          <img 
-            src={product.images?.[0]?.image_url} 
-            alt={product.name} 
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-          />
-        </div>
-
-        {/* Info & Selectors */}
-        <div className="flex-1 space-y-6">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-            <div className="space-y-1">
-              <h3 className="text-2xl font-serif font-bold tracking-tight">{product.name}</h3>
-              <p className="text-sm text-muted-foreground line-clamp-1">{product.material} • {product.motif}</p>
+    <div className="space-y-12">
+      {/* Availability */}
+      <div className="space-y-6">
+        <h4 className="text-[10px] font-bold tracking-widest uppercase">Availability</h4>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between group cursor-pointer" onClick={() => toggleAvailability('in-stock')}>
+            <div className="flex items-center gap-3">
+              <Checkbox.Root 
+                checked={availability.includes('in-stock')}
+                className="w-4 h-4 rounded border border-primary/20 flex items-center justify-center bg-white data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-colors"
+              >
+                <Checkbox.Indicator>
+                  <X className="w-3 h-3 text-white" />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
+              <span className="text-sm font-medium">In stock</span>
             </div>
-            <div className="text-right">
-              <p className="text-xl font-bold tracking-tighter">Rp {product.base_price.toLocaleString()}</p>
-              <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Base Price</p>
-            </div>
+            <span className="text-[10px] text-muted-foreground">({inStockCount})</span>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4 border-t border-primary/5">
-            {/* Size Selector */}
-            <div className="space-y-3">
-              <Label className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Select Size</Label>
-              <div className="flex flex-wrap gap-2">
-                {['S', 'M', 'L', 'XL'].map((size) => {
-                  const isAvailable = sizes.includes(size);
-                  return (
-                    <button
-                      key={size}
-                      disabled={!isAvailable}
-                      onClick={() => setSelectedSize(size)}
-                      className={`w-10 h-10 rounded-full text-[10px] font-bold transition-all duration-300 border ${
-                        selectedSize === size
-                          ? 'bg-primary text-white border-primary shadow-lg scale-110'
-                          : isAvailable
-                            ? 'bg-white text-primary border-primary/10 hover:border-secondary hover:text-secondary'
-                            : 'bg-muted/50 text-muted-foreground border-transparent cursor-not-allowed opacity-30'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  );
-                })}
-              </div>
+          <div className="flex items-center justify-between group cursor-pointer" onClick={() => toggleAvailability('out-of-stock')}>
+            <div className="flex items-center gap-3">
+              <Checkbox.Root 
+                checked={availability.includes('out-of-stock')}
+                className="w-4 h-4 rounded border border-primary/20 flex items-center justify-center bg-white data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-colors"
+              >
+                <Checkbox.Indicator>
+                  <X className="w-3 h-3 text-white" />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
+              <span className="text-sm font-medium">Out of stock</span>
             </div>
-
-            {/* Color Selector */}
-            <div className="space-y-3">
-              <Label className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Select Color</Label>
-              <div className="flex flex-wrap gap-3">
-                {colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all duration-300 relative ${
-                      selectedColor === color ? 'border-secondary scale-125' : 'border-transparent hover:scale-110'
-                    }`}
-                    title={color}
-                  >
-                    <span 
-                      className="absolute inset-0.5 rounded-full shadow-inner" 
-                      style={{ backgroundColor: color.toLowerCase() }}
-                    />
-                    {selectedColor === color && (
-                      <motion.div 
-                        layoutId="color-active"
-                        className="absolute -inset-1 rounded-full border border-secondary"
-                      />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quantity & Total */}
-            <div className="space-y-3">
-              <Label className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Quantity</Label>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center bg-muted/30 rounded-full p-1 border border-primary/5">
-                  <button 
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white transition-colors"
-                  >
-                    <Minus className="w-3 h-3" />
-                  </button>
-                  <span className="w-8 text-center text-xs font-bold">{quantity}</span>
-                  <button 
-                    onClick={() => setQuantity(q => q + 1)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white transition-colors"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
-                </div>
-                <div className="flex-1 text-right">
-                  <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground">Total</p>
-                  <p className="text-lg font-bold tracking-tighter text-secondary">Rp {total.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
+            <span className="text-[10px] text-muted-foreground">({outOfStockCount})</span>
           </div>
         </div>
+      </div>
 
-        {/* CTA */}
-        <div className="lg:w-48 flex items-end">
-          <Button 
-            disabled={!selectedSize || !selectedColor}
-            onClick={handleAddToCart}
-            className={`w-full h-14 rounded-2xl font-bold tracking-widest uppercase text-[10px] transition-all duration-500 ${
-              selectedSize && selectedColor 
-                ? 'bg-secondary text-primary hover:bg-hover hover:text-white shadow-xl shadow-secondary/20' 
-                : 'bg-muted text-muted-foreground cursor-not-allowed'
-            }`}
+      {/* Price Range */}
+      <div className="space-y-6">
+        <h4 className="text-[10px] font-bold tracking-widest uppercase">Price</h4>
+        <div className="px-2">
+          <Slider.Root
+            className="relative flex items-center select-none touch-none w-full h-5"
+            value={priceRange}
+            max={5000000}
+            step={10000}
+            onValueChange={(val) => setPriceRange(val as [number, number])}
           >
-            Add to Cart
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+            <Slider.Track className="bg-primary/10 relative grow rounded-full h-[2px]">
+              <Slider.Range className="absolute bg-primary rounded-full h-full" />
+            </Slider.Track>
+            <Slider.Thumb className="block w-4 h-4 bg-primary rounded-full shadow-lg hover:scale-110 transition-transform focus:outline-none" />
+            <Slider.Thumb className="block w-4 h-4 bg-primary rounded-full shadow-lg hover:scale-110 transition-transform focus:outline-none" />
+          </Slider.Root>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <span className="text-[8px] font-bold tracking-widest uppercase text-muted-foreground">Min Rp</span>
+            <div className="h-10 border border-primary/20 bg-white rounded flex items-center px-3 text-xs font-bold">
+              <span className="text-muted-foreground mr-1">Rp</span>
+              {priceRange[0].toLocaleString()}
+            </div>
+          </div>
+          <div className="space-y-2 text-right">
+            <span className="text-[8px] font-bold tracking-widest uppercase text-muted-foreground">Max Rp</span>
+            <div className="h-10 border border-primary/20 bg-white rounded flex items-center px-3 text-xs font-bold justify-end">
+              <span className="text-muted-foreground mr-1">Rp</span>
+              {priceRange[1].toLocaleString()}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function Label({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={className}>{children}</p>;
+function ProductCard({ product, viewMode, onAddToCart }: { product: Product; viewMode: 'grid' | 'list'; onAddToCart: (item: CartItem) => void }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const totalStock = product.variants?.reduce((sum, v) => sum + v.stock_quantity, 0) || 0;
+
+  if (viewMode === 'list') {
+    return (
+      <motion.div 
+        layout
+        className="group flex flex-col md:flex-row gap-8 items-center bg-white p-6 rounded-3xl border border-primary/5 hover:border-secondary/30 transition-all duration-500"
+      >
+        <div className="w-full md:w-48 aspect-[4/5] rounded-2xl overflow-hidden bg-muted shrink-0 relative">
+          <img 
+            src={product.images?.[0]?.image_url} 
+            alt={product.name} 
+            onLoad={() => setIsLoaded(true)}
+            className={`w-full h-full object-cover transition-all duration-700 ${isLoaded ? 'scale-100 blur-0' : 'scale-110 blur-xl'}`}
+          />
+          {totalStock === 0 && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <span className="text-[10px] font-bold tracking-widest uppercase text-white border border-white/20 px-4 py-2 rounded-full backdrop-blur-md">
+                Out of Stock
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="flex-1 space-y-4 text-center md:text-left">
+          <div className="space-y-1">
+            <h3 className="text-2xl font-serif font-bold tracking-tight">{product.name}</h3>
+            <p className="text-sm text-muted-foreground">{product.material} • {product.motif}</p>
+          </div>
+          <p className="text-xl font-bold tracking-tighter">Rp {product.base_price.toLocaleString()}</p>
+          <Button 
+            onClick={() => {
+              // For simplicity, add the first variant or open a quick view
+              if (product.variants && product.variants.length > 0) {
+                onAddToCart({
+                  id: product.id,
+                  name: product.name,
+                  price: product.base_price,
+                  image: product.images?.[0]?.image_url || '',
+                  variantId: product.variants[0].id,
+                  selectedSize: product.variants[0].size_option,
+                  selectedColor: product.variants[0].color_option,
+                  quantity: 1
+                });
+                toast.success(`${product.name} added to cart`);
+              }
+            }}
+            disabled={totalStock === 0}
+            className="rounded-full h-12 px-8 font-bold tracking-widest uppercase text-[10px]"
+          >
+            Quick Add
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div 
+      layout
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group space-y-6"
+    >
+      <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-muted">
+        <img 
+          src={product.images?.[0]?.image_url} 
+          alt={product.name} 
+          onLoad={() => setIsLoaded(true)}
+          className={`w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${isLoaded ? 'scale-100 blur-0' : 'scale-110 blur-xl'}`}
+        />
+        
+        {/* Quick Add Overlay */}
+        <AnimatePresence>
+          {isHovered && totalStock > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="absolute inset-x-4 bottom-4"
+            >
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (product.variants && product.variants.length > 0) {
+                    onAddToCart({
+                      id: product.id,
+                      name: product.name,
+                      price: product.base_price,
+                      image: product.images?.[0]?.image_url || '',
+                      variantId: product.variants[0].id,
+                      selectedSize: product.variants[0].size_option,
+                      selectedColor: product.variants[0].color_option,
+                      quantity: 1
+                    });
+                    toast.success(`${product.name} added to cart`);
+                  }
+                }}
+                className="w-full h-12 bg-white/90 backdrop-blur-md text-primary hover:bg-white transition-all rounded-2xl font-bold tracking-widest uppercase text-[10px] shadow-xl"
+              >
+                Quick Add
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {totalStock === 0 && (
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+            <span className="text-[10px] font-bold tracking-widest uppercase text-white border border-white/20 px-4 py-2 rounded-full backdrop-blur-md">
+              Out of Stock
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2 text-center">
+        <h3 className="text-sm font-bold tracking-tight group-hover:text-secondary transition-colors uppercase">
+          {product.name}
+        </h3>
+        <p className="text-lg font-bold tracking-tighter">
+          Rp {product.base_price.toLocaleString()}
+        </p>
+      </div>
+    </motion.div>
+  );
 }

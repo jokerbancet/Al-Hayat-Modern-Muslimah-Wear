@@ -75,16 +75,18 @@ export default function App() {
     }
   };
 
-  const handleUpdateQuantity = (id: string, delta: number) => {
+  const handleUpdateQuantity = (id: string, size: string, color: string, delta: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
+        item.id === id && item.selectedSize === size && item.selectedColor === color
+          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+          : item
       )
     );
   };
 
-  const handleRemoveFromCart = (id: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const handleRemoveFromCart = (id: string, size: string, color: string) => {
+    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.selectedSize === size && item.selectedColor === color)));
   };
 
   const handleAddToCart = (item: CartItem) => {
@@ -107,7 +109,7 @@ export default function App() {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isLoginPage = location.pathname === '/login';
 
-  if (loading) {
+  if (loading || loadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
