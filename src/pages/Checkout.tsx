@@ -9,6 +9,7 @@ import { Label } from '../components/ui/label';
 import { CartItem } from '../types';
 import { useMidtrans } from '../hooks/useMidtrans';
 import { toast } from 'sonner';
+import { formatCurrency } from '../lib/utils';
 
 interface CheckoutProps {
   items: CartItem[];
@@ -255,7 +256,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
                         {item.selectedColor} / {item.selectedSize} × {item.quantity}
                       </p>
                     </div>
-                    <p className="text-sm font-bold">${item.price * item.quantity}</p>
+                    <p className="text-sm font-bold">{formatCurrency(item.price * item.quantity)}</p>
                   </div>
                 );
               })}
@@ -264,7 +265,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
             <div className="space-y-4 pt-8 border-t">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('common.subtotal')}</span>
-                <span className="font-bold">${subtotal}</span>
+                <span className="font-bold">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('common.shipping')}</span>
@@ -272,7 +273,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
               </div>
               <div className="pt-4 flex justify-between items-center">
                 <span className="text-xl font-serif font-bold">{t('common.total')}</span>
-                <span className="text-3xl font-serif font-bold">${subtotal}</span>
+                <span className="text-3xl font-serif font-bold">{formatCurrency(subtotal)}</span>
               </div>
             </div>
           </motion.div>

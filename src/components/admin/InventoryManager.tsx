@@ -8,6 +8,7 @@ import { Badge } from '../ui/badge';
 import { supabase } from '../../lib/supabase';
 import { Product, Category, Variant } from '../../types';
 import { toast } from 'sonner';
+import { formatCurrency } from '../../lib/utils';
 
 export default function InventoryManager() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -190,13 +191,13 @@ export default function InventoryManager() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Base Price ($)</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Base Price (IDR)</Label>
               <Input 
                 required
                 type="number"
                 value={newProduct.base_price}
                 onChange={(e) => setNewProduct({ ...newProduct, base_price: parseFloat(e.target.value) })}
-                placeholder="0.00" 
+                placeholder="0" 
                 className="h-12"
               />
             </div>
@@ -283,7 +284,7 @@ export default function InventoryManager() {
                     {product.category?.name || 'Uncategorized'}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-medium">${product.base_price}</TableCell>
+                <TableCell className="font-medium">{formatCurrency(product.base_price)}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Package className="w-3 h-3 text-muted-foreground" />
@@ -400,7 +401,7 @@ export default function InventoryManager() {
                               <TableCell className="font-bold">{v.size || '-'}</TableCell>
                               <TableCell>{v.color || '-'}</TableCell>
                               <TableCell>{v.stock}</TableCell>
-                              <TableCell>{v.price_override ? `$${v.price_override}` : '-'}</TableCell>
+                              <TableCell>{v.price_override ? formatCurrency(v.price_override) : '-'}</TableCell>
                               <TableCell className="text-right">
                                 <Button 
                                   variant="ghost" 

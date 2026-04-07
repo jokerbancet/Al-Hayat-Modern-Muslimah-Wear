@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Product, CartItem } from '../../types';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
+import { formatCurrency } from '../../lib/utils';
 import QuickView from './QuickView';
 
 interface ProductCardProps {
@@ -94,7 +95,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
             <h3 className="text-sm font-medium tracking-tight group-hover:text-secondary transition-colors">
               {productName}
             </h3>
-            <p className="text-sm font-medium">${product.base_price}</p>
+            <p className="text-sm font-medium">{formatCurrency(product.base_price)}</p>
           </div>
         </div>
       </motion.div>

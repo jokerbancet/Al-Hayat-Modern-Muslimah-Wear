@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatCurrency } from '../../lib/utils';
 
 interface OrderConfirmationProps {
   orderNumber: string;
@@ -34,12 +35,12 @@ export default function OrderConfirmation({ orderNumber, customerName, items, to
           {items.map((item, index) => (
             <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '14px' }}>
               <span>{item.name} x {item.quantity}</span>
-              <span>${item.price * item.quantity}</span>
+              <span>{formatCurrency(item.price * item.quantity)}</span>
             </div>
           ))}
           <div style={{ borderTop: '1px solid #F4C2C2', marginTop: '15px', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
             <span>Total</span>
-            <span>${total}</span>
+            <span>{formatCurrency(total)}</span>
           </div>
         </div>
 

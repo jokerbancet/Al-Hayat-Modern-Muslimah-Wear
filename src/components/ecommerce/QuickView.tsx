@@ -9,6 +9,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { MOCK_SIZE_GUIDE } from '../../lib/mock-data';
 import { toast } from 'sonner';
+import { formatCurrency } from '../../lib/utils';
 
 interface QuickViewProps {
   product: Product;
@@ -92,7 +93,7 @@ export default function QuickView({ product, isOpen, onClose, onAddToCart }: Qui
                 {product.category?.name}
               </p>
               <h2 className="text-3xl font-serif font-bold tracking-tight">{productName}</h2>
-              <p className="text-2xl font-medium">${product.base_price}</p>
+              <p className="text-2xl font-medium">{formatCurrency(product.base_price)}</p>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {productDescription}
               </p>

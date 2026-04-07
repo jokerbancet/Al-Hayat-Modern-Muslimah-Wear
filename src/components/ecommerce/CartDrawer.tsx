@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { CartItem } from '../../types';
+import { formatCurrency } from '../../lib/utils';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -100,7 +101,7 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
-                        <p className="text-sm font-bold">${item.price * item.quantity}</p>
+                        <p className="text-sm font-bold">{formatCurrency(item.price * item.quantity)}</p>
                       </div>
                     </div>
                   </div>
@@ -115,7 +116,7 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('common.subtotal')}</span>
-                <span className="font-bold">${subtotal}</span>
+                <span className="font-bold">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('common.shipping')}</span>
@@ -123,7 +124,7 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
               </div>
               <div className="pt-4 flex justify-between items-center">
                 <span className="text-lg font-serif font-bold">{t('common.total')}</span>
-                <span className="text-2xl font-serif font-bold">${subtotal}</span>
+                <span className="text-2xl font-serif font-bold">{formatCurrency(subtotal)}</span>
               </div>
             </div>
             

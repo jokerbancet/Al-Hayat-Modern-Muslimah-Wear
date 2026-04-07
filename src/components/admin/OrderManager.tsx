@@ -5,6 +5,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
+import { formatCurrency } from '../../lib/utils';
 
 export default function OrderManager() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -63,7 +64,7 @@ export default function OrderManager() {
         <div className="bg-white p-6 border rounded-xl space-y-2">
           <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Revenue</p>
           <p className="text-3xl font-serif font-bold text-sage">
-            ${orders.filter(o => o.status === 'paid').reduce((sum, o) => sum + o.total_amount, 0)}
+            {formatCurrency(orders.filter(o => o.status === 'paid').reduce((sum, o) => sum + o.total_amount, 0))}
           </p>
         </div>
       </div>
@@ -102,7 +103,7 @@ export default function OrderManager() {
                   <TableCell className="text-xs text-muted-foreground">
                     {new Date(order.created_at).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="font-bold">${order.final_amount}</TableCell>
+                  <TableCell className="font-bold">{formatCurrency(order.final_amount)}</TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">

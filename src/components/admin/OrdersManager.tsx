@@ -4,6 +4,7 @@ import { Badge } from '../ui/badge';
 import { getOrders, Order } from '../../lib/orders';
 import { Loader2, ExternalLink } from 'lucide-react';
 import { Button } from '../ui/button';
+import { formatCurrency } from '../../lib/utils';
 
 export default function OrdersManager() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -67,7 +68,7 @@ export default function OrdersManager() {
                       <p className="text-[10px] text-muted-foreground">{order.customer_email}</p>
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">${order.total_amount}</TableCell>
+                  <TableCell className="font-medium">{formatCurrency(order.total_amount)}</TableCell>
                   <TableCell>
                     <Badge className={`
                       border-none text-[10px] font-bold tracking-widest uppercase

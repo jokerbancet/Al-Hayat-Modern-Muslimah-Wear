@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Ticket, Calendar, Percent, DollarSign, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Ticket, Calendar, Percent, Banknote, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../ui/badge';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
+import { formatCurrency } from '../../lib/utils';
 
 export default function VoucherManager() {
   const [vouchers, setVouchers] = useState<any[]>([]);
@@ -124,7 +125,7 @@ export default function VoucherManager() {
                 className="w-full h-12 px-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
               >
                 <option value="percentage">Percentage (%)</option>
-                <option value="fixed">Fixed Amount ($)</option>
+                <option value="fixed">Fixed Amount (IDR)</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -139,17 +140,17 @@ export default function VoucherManager() {
                   className="h-12 pl-10"
                 />
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  {newVoucher.discount_type === 'percentage' ? <Percent className="w-4 h-4" /> : <DollarSign className="w-4 h-4" />}
+                  {newVoucher.discount_type === 'percentage' ? <Percent className="w-4 h-4" /> : <Banknote className="w-4 h-4" />}
                 </div>
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Minimum Spend ($)</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Minimum Spend (IDR)</Label>
               <Input 
                 type="number"
                 value={newVoucher.min_spend}
                 onChange={(e) => setNewVoucher({ ...newVoucher, min_spend: parseFloat(e.target.value) })}
-                placeholder="0.00" 
+                placeholder="0" 
                 className="h-12"
               />
             </div>
@@ -185,10 +186,10 @@ export default function VoucherManager() {
                 </TableCell>
                 <TableCell>
                   <span className="font-medium">
-                    {voucher.discount_type === 'percentage' ? `${voucher.discount_value}%` : `$${voucher.discount_value}`}
+                    {voucher.discount_type === 'percentage' ? `${voucher.discount_value}%` : formatCurrency(voucher.discount_value)}
                   </span>
                 </TableCell>
-                <TableCell className="text-muted-foreground">${voucher.min_spend}</TableCell>
+                <TableCell className="text-muted-foreground">{formatCurrency(voucher.min_spend)}</TableCell>
                 <TableCell>
                   <span className="text-sm">{voucher.times_used} / {voucher.usage_limit || '∞'}</span>
                 </TableCell>
