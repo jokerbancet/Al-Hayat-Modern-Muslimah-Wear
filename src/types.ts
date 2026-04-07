@@ -3,6 +3,8 @@ export interface Category {
   name: string;
   slug: string;
   description?: string;
+  image_url?: string;
+  created_at?: string;
 }
 
 export interface Product {
@@ -11,30 +13,29 @@ export interface Product {
   slug: string;
   description?: string;
   base_price: number;
-  category_id?: string;
+  category_id: string;
+  category?: Category;
+  age_category: string;
+  motif: string;
+  material: string;
   is_featured: boolean;
   created_at?: string;
-  category?: Category;
   images?: ProductImage[];
-  variants?: Variant[];
+  variants?: ProductVariant[];
 }
 
-export interface Variant {
+export interface ProductVariant {
   id: string;
   product_id: string;
-  size?: string;
-  color?: string;
-  stock: number;
-  price_override?: number;
-  sku?: string;
+  color_option: string;
+  size_option: string;
+  stock_quantity: number;
 }
 
 export interface ProductImage {
   id: string;
   product_id: string;
-  url: string;
-  alt_text?: string;
-  is_primary: boolean;
+  image_url: string;
   display_order: number;
 }
 

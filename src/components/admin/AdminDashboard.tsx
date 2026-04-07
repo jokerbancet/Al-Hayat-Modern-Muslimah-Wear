@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { LayoutDashboard, Package, Image as ImageIcon, Settings, LogOut, ChevronRight, Menu, ShoppingBag, User, Ticket } from 'lucide-react';
+import { LayoutDashboard, Package, Image as ImageIcon, Settings, LogOut, ChevronRight, Menu, ShoppingBag, User, Ticket, Layers } from 'lucide-react';
 import { Button } from '../ui/button';
 import InventoryManager from './InventoryManager';
 import OrderManager from './OrderManager';
 import VoucherManager from './VoucherManager';
+import CategoryManager from './CategoryManager';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function AdminDashboard() {
@@ -12,6 +13,7 @@ export default function AdminDashboard() {
 
   const sidebarLinks = [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
+    { id: 'categories', name: 'Categories', icon: Layers },
     { id: 'inventory', name: 'Inventory Control', icon: Package },
     { id: 'orders', name: 'Orders', icon: ShoppingBag },
     { id: 'vouchers', name: 'Vouchers', icon: Ticket },
@@ -75,6 +77,7 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <main className="flex-1 p-8 md:p-12 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
+          {activeTab === 'categories' && <CategoryManager />}
           {activeTab === 'inventory' && <InventoryManager />}
           {activeTab === 'orders' && <OrderManager />}
           {activeTab === 'vouchers' && <VoucherManager />}

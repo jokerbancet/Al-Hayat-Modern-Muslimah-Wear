@@ -1,28 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Package, Image as ImageIcon, LayoutDashboard, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, Image as ImageIcon, Loader2, ChevronLeft } from 'lucide-react';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
 import { supabase } from '../../lib/supabase';
-import { Product, Category, Variant } from '../../types';
+import { Product } from '../../types';
 import { toast } from 'sonner';
 import { formatCurrency } from '../../lib/utils';
+import ProductForm from './ProductForm';
 
 export default function InventoryManager() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    slug: '',
-    description: '',
-    base_price: 0,
-    category_id: '',
-    is_featured: false
-  });
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -31,54 +22,55 @@ export default function InventoryManager() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch Categories
-      const { data: catData, error: catError } = await supabase
-        .from('categories')
-        .select('*');
-      if (catError) throw catError;
-      setCategories(catData || []);
-
-      // Fetch Products with related data
+      // Attempt joined fetch first
       const { data: prodData, error: prodError } = await supabase
         .from('products')
         .select(`
           *,
-          category:categories(*),
+          category:categories(name),
           images:product_images(*),
-          variants(*)
+          variants:variants!variants_product_id_fkey(*)
         `)
         .order('created_at', { ascending: false });
       
-      if (prodError) throw prodError;
+      if (prodError) {
+        // Fallback: Fetch separately if relationship is missing
+        if (prodError.message.includes('relationship')) {
+          console.warn('Supabase relationship missing, falling back to separate fetches');
+          
+          const [productsRes, imagesRes, variantsRes, categoriesRes] = await Promise.all([
+            supabase.from('products').select('*').order('created_at', { ascending: false }),
+            supabase.from('product_images').select('*'),
+            supabase.from('variants').select('*'),
+            supabase.from('categories').select('id, name')
+          ]);
+
+          if (productsRes.error) throw productsRes.error;
+
+          const combinedData = (productsRes.data || []).map(product => ({
+            ...product,
+            category: (categoriesRes.data || []).find(c => c.id === product.category_id),
+            images: (imagesRes.data || []).filter(img => img.product_id === product.id),
+            variants: (variantsRes.data || []).filter(v => v.product_id === product.id)
+          }));
+
+          setProducts(combinedData);
+          return;
+        }
+        throw prodError;
+      }
+      
       setProducts(prodData || []);
     } catch (error: any) {
+      console.error('Fetch error:', error);
       toast.error('Error fetching data: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddProduct = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .insert([newProduct])
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      toast.success('Product added successfully');
-      setIsAdding(false);
-      setNewProduct({ name: '', slug: '', description: '', base_price: 0, category_id: '', is_featured: false });
-      fetchData();
-    } catch (error: any) {
-      toast.error('Error adding product: ' + error.message);
-    }
-  };
-
   const handleDeleteProduct = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this product?')) return;
     try {
       const { error } = await supabase
         .from('products')
@@ -94,55 +86,52 @@ export default function InventoryManager() {
     }
   };
 
-  const getTotalStock = (variants: Variant[] = []) => {
-    return variants.reduce((sum, v) => sum + v.stock, 0);
-  };
-
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [newVariant, setNewVariant] = useState({
-    size: '',
-    color: '',
-    stock: 0,
-    price_override: 0,
-    sku: ''
-  });
-
-  const handleAddVariant = async (productId: string) => {
-    try {
-      const { error } = await supabase
-        .from('variants')
-        .insert([{ ...newVariant, product_id: productId }]);
-
-      if (error) throw error;
-      
-      toast.success('Variant added');
-      setNewVariant({ size: '', color: '', stock: 0, price_override: 0, sku: '' });
-      fetchData();
-    } catch (error: any) {
-      toast.error('Error adding variant: ' + error.message);
-    }
-  };
-
-  const handleDeleteVariant = async (variantId: string) => {
-    try {
-      const { error } = await supabase
-        .from('variants')
-        .delete()
-        .eq('id', variantId);
-
-      if (error) throw error;
-      
-      toast.success('Variant deleted');
-      fetchData();
-    } catch (error: any) {
-      toast.error('Error deleting variant: ' + error.message);
-    }
+  const getTotalStock = (variants: any[] = []) => {
+    return variants.reduce((sum, v) => sum + v.stock_quantity, 0);
   };
 
   if (loading && products.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isAdding || editingProduct) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => { setIsAdding(false); setEditingProduct(null); }}
+            className="hover:bg-muted"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          <div className="space-y-1">
+            <h2 className="text-3xl font-serif font-bold tracking-tight">
+              {editingProduct ? 'Edit Product' : 'New Product'}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {editingProduct ? `Updating: ${editingProduct.name}` : 'Fill in the details to create a new catalog item.'}
+            </p>
+          </div>
+        </div>
+
+        <ProductForm 
+          initialData={editingProduct}
+          onSuccess={() => {
+            setIsAdding(false);
+            setEditingProduct(null);
+            fetchData();
+          }}
+          onCancel={() => {
+            setIsAdding(false);
+            setEditingProduct(null);
+          }}
+        />
       </div>
     );
   }
@@ -155,82 +144,13 @@ export default function InventoryManager() {
           <p className="text-sm text-muted-foreground">Manage your products, stock levels, and variants.</p>
         </div>
         <Button 
-          onClick={() => setIsAdding(!isAdding)}
+          onClick={() => setIsAdding(true)}
           className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-hover hover:text-white transition-all duration-300"
         >
-          {isAdding ? 'Cancel' : (
-            <>
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Product
-            </>
-          )}
+          <Plus className="w-4 h-4 mr-2" />
+          Add New Product
         </Button>
       </div>
-
-      {isAdding && (
-        <div className="bg-white p-8 border rounded-xl shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
-          <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Product Name</Label>
-              <Input 
-                required
-                value={newProduct.name}
-                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-') })}
-                placeholder="e.g. Silk Abaya" 
-                className="h-12"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Slug</Label>
-              <Input 
-                required
-                value={newProduct.slug}
-                onChange={(e) => setNewProduct({ ...newProduct, slug: e.target.value })}
-                placeholder="e.g. silk-abaya" 
-                className="h-12"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Base Price (IDR)</Label>
-              <Input 
-                required
-                type="number"
-                value={newProduct.base_price}
-                onChange={(e) => setNewProduct({ ...newProduct, base_price: parseFloat(e.target.value) })}
-                placeholder="0" 
-                className="h-12"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Category</Label>
-              <select 
-                value={newProduct.category_id}
-                onChange={(e) => setNewProduct({ ...newProduct, category_id: e.target.value })}
-                className="w-full h-12 px-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-              >
-                <option value="">Select Category</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="md:col-span-2 space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Description</Label>
-              <textarea 
-                value={newProduct.description}
-                onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                className="w-full min-h-[100px] p-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                placeholder="Enter product details..."
-              />
-            </div>
-            <div className="md:col-span-2">
-              <Button type="submit" className="w-full h-12 bg-primary text-white font-bold tracking-widest uppercase text-[10px]">
-                Save Product
-              </Button>
-            </div>
-          </form>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 border rounded-xl space-y-2">
@@ -244,8 +164,10 @@ export default function InventoryManager() {
           </p>
         </div>
         <div className="bg-white p-6 border rounded-xl space-y-2">
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Categories</p>
-          <p className="text-3xl font-serif font-bold">{categories.length}</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Stock Value</p>
+          <p className="text-3xl font-serif font-bold">
+            {formatCurrency(products.reduce((sum, p) => sum + (p.base_price * getTotalStock(p.variants)), 0))}
+          </p>
         </div>
       </div>
 
@@ -268,7 +190,7 @@ export default function InventoryManager() {
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-16 bg-muted rounded overflow-hidden flex items-center justify-center">
                       {product.images && product.images.length > 0 ? (
-                        <img src={product.images.find(img => img.is_primary)?.url || product.images[0].url} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        <img src={product.images[0].image_url} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
                         <ImageIcon className="w-6 h-6 text-muted-foreground" />
                       )}
@@ -311,8 +233,8 @@ export default function InventoryManager() {
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      onClick={() => setEditingProduct(editingProduct?.id === product.id ? null : product)}
-                      className={`hover:text-secondary ${editingProduct?.id === product.id ? 'text-secondary bg-secondary/10' : ''}`}
+                      onClick={() => setEditingProduct(product)}
+                      className="hover:text-secondary"
                     >
                       <Edit2 className="w-4 h-4" />
                     </Button>
@@ -328,99 +250,6 @@ export default function InventoryManager() {
                 </TableCell>
               </TableRow>
             ))}
-            {editingProduct && (
-              <TableRow className="bg-muted/30">
-                <TableCell colSpan={6} className="p-8">
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-serif font-bold">Manage Variants: {editingProduct.name}</h3>
-                      <Button variant="ghost" size="sm" onClick={() => setEditingProduct(null)}>Close</Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end bg-white p-6 border rounded-xl">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold tracking-widest uppercase">Size</Label>
-                        <Input 
-                          value={newVariant.size}
-                          onChange={(e) => setNewVariant({ ...newVariant, size: e.target.value })}
-                          placeholder="e.g. M, L, XL" 
-                          className="h-10"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold tracking-widest uppercase">Color</Label>
-                        <Input 
-                          value={newVariant.color}
-                          onChange={(e) => setNewVariant({ ...newVariant, color: e.target.value })}
-                          placeholder="e.g. Sage, Black" 
-                          className="h-10"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold tracking-widest uppercase">Stock</Label>
-                        <Input 
-                          type="number"
-                          value={newVariant.stock}
-                          onChange={(e) => setNewVariant({ ...newVariant, stock: parseInt(e.target.value) })}
-                          placeholder="0" 
-                          className="h-10"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-bold tracking-widest uppercase">Price Override</Label>
-                        <Input 
-                          type="number"
-                          value={newVariant.price_override}
-                          onChange={(e) => setNewVariant({ ...newVariant, price_override: parseFloat(e.target.value) })}
-                          placeholder="0.00" 
-                          className="h-10"
-                        />
-                      </div>
-                      <Button 
-                        onClick={() => handleAddVariant(editingProduct.id)}
-                        className="h-10 bg-primary text-white font-bold tracking-widest uppercase text-[10px]"
-                      >
-                        Add Variant
-                      </Button>
-                    </div>
-
-                    <div className="bg-white border rounded-xl overflow-hidden">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-[10px] font-bold tracking-widest uppercase">Size</TableHead>
-                            <TableHead className="text-[10px] font-bold tracking-widest uppercase">Color</TableHead>
-                            <TableHead className="text-[10px] font-bold tracking-widest uppercase">Stock</TableHead>
-                            <TableHead className="text-[10px] font-bold tracking-widest uppercase">Price Override</TableHead>
-                            <TableHead className="text-right text-[10px] font-bold tracking-widest uppercase">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {editingProduct.variants?.map((v) => (
-                            <TableRow key={v.id}>
-                              <TableCell className="font-bold">{v.size || '-'}</TableCell>
-                              <TableCell>{v.color || '-'}</TableCell>
-                              <TableCell>{v.stock}</TableCell>
-                              <TableCell>{v.price_override ? formatCurrency(v.price_override) : '-'}</TableCell>
-                              <TableCell className="text-right">
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  onClick={() => handleDeleteVariant(v.id)}
-                                  className="hover:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
             {products.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">

@@ -4,13 +4,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { Category } from '../../types';
 
 interface NavbarProps {
   onCartClick: () => void;
   cartCount: number;
+  categories: Category[];
 }
 
-export default function Navbar({ onCartClick, cartCount }: NavbarProps) {
+export default function Navbar({ onCartClick, cartCount, categories }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const { t, i18n } = useTranslation();
 
@@ -22,12 +24,18 @@ export default function Navbar({ onCartClick, cartCount }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: t('nav.essentials'), href: '#essentials' },
-    { name: t('nav.occasion'), href: '#occasion' },
-    { name: t('nav.seasonal'), href: '#seasonal' },
-    { name: t('nav.size_guide'), href: '#size-guide' },
-  ];
+  const navLinks = categories.map(cat => ({
+    name: cat.name,
+    href: `/category/${cat.slug}`
+  }));
+
+  // Add Size Guide as the last link if categories are few, or handle separately
+  const allLinks = [...navLinks, { name: t('nav.size_guide'), href: '#size-guide' }];
+
+  // Split links for desktop view (max 5 on each side if we have 10 total)
+  const midPoint = Math.ceil(allLinks.length / 2);
+  const leftLinks = allLinks.slice(0, midPoint);
+  const rightLinks = allLinks.slice(midPoint);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'id' : 'en';
@@ -41,31 +49,31 @@ export default function Navbar({ onCartClick, cartCount }: NavbarProps) {
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <div className="flex-1 hidden md:flex items-center gap-8">
-          {navLinks.slice(0, 2).map((link) => (
+        <div className="flex-1 hidden md:flex items-center gap-6 overflow-x-auto no-scrollbar">
+          {leftLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-xs font-semibold tracking-widest hover:text-hover transition-colors"
+              className="text-[10px] font-bold tracking-widest uppercase hover:text-secondary transition-colors whitespace-nowrap"
             >
               {link.name}
             </a>
           ))}
         </div>
 
-        <div className="flex-1 flex justify-center">
+        <div className="flex-shrink-0 px-8">
           <a href="/" className="text-2xl md:text-3xl font-serif font-bold tracking-tighter">
             AL-HAYAT
           </a>
         </div>
 
         <div className="flex-1 flex items-center justify-end gap-6">
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.slice(2).map((link) => (
+          <div className="hidden md:flex items-center gap-6 overflow-x-auto no-scrollbar">
+            {rightLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                className="text-xs font-semibold tracking-widest hover:text-hover transition-colors"
+                className="text-[10px] font-bold tracking-widest uppercase hover:text-secondary transition-colors whitespace-nowrap"
               >
                 {link.name}
               </a>
@@ -101,13 +109,13 @@ export default function Navbar({ onCartClick, cartCount }: NavbarProps) {
                   <Menu className="w-6 h-6" />
                 </Button>
               } />
-              <SheetContent side="right" className="w-full sm:w-[350px] bg-background">
-                <div className="flex flex-col gap-8 mt-12">
-                  {navLinks.map((link) => (
+              <SheetContent side="right" className="w-full sm:w-[350px] bg-background overflow-y-auto">
+                <div className="flex flex-col gap-6 mt-12">
+                  {allLinks.map((link) => (
                     <a
                       key={link.name}
                       href={link.href}
-                      className="text-2xl font-serif font-medium hover:text-hover transition-colors"
+                      className="text-xl font-serif font-medium hover:text-secondary transition-colors"
                     >
                       {link.name}
                     </a>

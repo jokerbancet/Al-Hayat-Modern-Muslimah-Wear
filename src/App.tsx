@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, Navigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import Navbar from './components/layout/Navbar';
@@ -13,19 +13,67 @@ import Login from './pages/admin/Login';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import Checkout from './pages/Checkout';
 import Success from './pages/Success';
+import CategoryPage from './pages/CategoryPage';
 import { MOCK_PRODUCTS } from './lib/mock-data';
 import { Toaster } from './components/ui/sonner';
 import { Button } from './components/ui/button';
-import { CartItem } from './types';
+import { CartItem, Category, Product } from './types';
 import { useAuth } from './hooks/useAuth';
+import { supabase } from './lib/supabase';
+import { toast } from 'sonner';
 
 export default function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
   const { user, isAdmin, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  const fetchInitialData = async () => {
+    setLoadingData(true);
+    try {
+      // Fetch Categories
+      const { data: catData, error: catError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true });
+      
+      if (catError) throw catError;
+      setCategories(catData || []);
+
+      // Fetch Products with images and variants
+      const { data: prodData, error: prodError } = await supabase
+        .from('products')
+        .select(`
+          *,
+          category:categories(*),
+          images:product_images(*),
+          variants:variants!variants_product_id_fkey(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (prodError) {
+        console.error('Error fetching products with joins, falling back to mock data:', prodError);
+        setProducts(MOCK_PRODUCTS);
+      } else {
+        setProducts(prodData || []);
+      }
+    } catch (error: any) {
+      console.error('Error fetching initial data:', error);
+      toast.error('Failed to load store data');
+      setProducts(MOCK_PRODUCTS);
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   const handleUpdateQuantity = (id: string, delta: number) => {
     setCartItems((prev) =>
@@ -70,7 +118,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background selection:bg-secondary selection:text-white">
       {!isAdminRoute && !isLoginPage && (
-        <Navbar onCartClick={() => setIsCartOpen(true)} cartCount={cartItems.length} />
+        <Navbar onCartClick={() => setIsCartOpen(true)} cartCount={cartItems.length} categories={categories} />
       )}
       
       <Routes>
@@ -80,88 +128,50 @@ export default function App() {
             <Hero />
 
             {/* Category Grid */}
-            <CategoryGrid />
+            <CategoryGrid categories={categories} />
 
-            {/* Featured Products Section */}
-            <section id="essentials" className="py-24 bg-background">
-              <div className="container mx-auto px-6">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase">
-                      {t('common.curated_selection')}
-                    </p>
-                    <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tight leading-tight">
-                      The <span className="italic">{t('common.essentials')}</span>
-                    </h2>
+            {/* Dynamic Category Sections */}
+            {categories.map((category, index) => {
+              const categoryProducts = products.filter(p => p.category_id === category.id);
+              if (categoryProducts.length === 0) return null;
+
+              return (
+                <section 
+                  key={category.id} 
+                  id={category.slug} 
+                  className={`py-24 bg-background ${index > 0 ? 'border-t' : ''}`}
+                >
+                  <div className="container mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+                      <div className="space-y-4">
+                        <p className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase">
+                          {category.name} Collection
+                        </p>
+                        <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tight leading-tight">
+                          {category.name.split(' ')[0]} <span className="italic">{category.name.split(' ').slice(1).join(' ') || 'Edit'}</span>
+                        </h2>
+                      </div>
+                      <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
+                        {category.description || `Discover our exclusive ${category.name} collection, crafted with elegance and style.`}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
+                      {categoryProducts.map((product) => (
+                        <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-                    {t('common.discover_essentials')}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
-                  {MOCK_PRODUCTS.map((product) => (
-                    <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-                  ))}
-                </div>
-              </div>
-            </section>
+                </section>
+              );
+            })}
 
             {/* Size Guide Section */}
             <SizeGuideSection />
-
-            {/* Occasion Wear Section */}
-            <section id="occasion" className="py-24 bg-background border-t">
-              <div className="container mx-auto px-6">
-                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase">
-                      {t('common.exquisite_craftsmanship')}
-                    </p>
-                    <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tight leading-tight">
-                      {t('common.occasion_wear')} <span className="italic">Wear</span>
-                    </h2>
-                  </div>
-                  <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-                    {t('common.discover_occasion')}
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                  {MOCK_PRODUCTS.filter(p => p.category?.name === 'Occasion Wear').map((product) => (
-                    <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Seasonal Section */}
-            <section id="seasonal" className="py-24 bg-background border-t">
-              <div className="container mx-auto px-6">
-                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase">
-                      {t('common.contemporary_designs')}
-                    </p>
-                    <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tight leading-tight">
-                      {t('common.seasonal')} <span className="italic">Edit</span>
-                    </h2>
-                  </div>
-                  <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-                    {t('common.discover_seasonal')}
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                  {MOCK_PRODUCTS.filter(p => p.category?.name === 'Seasonal').map((product) => (
-                    <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-                  ))}
-                </div>
-              </div>
-            </section>
           </main>
         } />
         <Route path="/checkout" element={<Checkout items={cartItems} onClearCart={clearCart} />} />
+        <Route path="/category/:slug" element={<CategoryPage onAddToCart={handleAddToCart} />} />
         <Route path="/success" element={<Success />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={
@@ -191,9 +201,9 @@ export default function App() {
               <div className="space-y-6">
                 <h4 className="text-[10px] font-bold tracking-widest uppercase text-secondary">Shop</h4>
                 <div className="flex flex-col gap-4">
-                  <a href="#essentials" className="text-sm hover:text-secondary transition-colors">{t('nav.essentials')}</a>
-                  <a href="#occasion" className="text-sm hover:text-secondary transition-colors">{t('nav.occasion')}</a>
-                  <a href="#seasonal" className="text-sm hover:text-secondary transition-colors">{t('nav.seasonal')}</a>
+                  {categories.map(cat => (
+                    <Link key={cat.id} to={`/category/${cat.slug}`} className="text-sm hover:text-secondary transition-colors">{cat.name}</Link>
+                  ))}
                   <a href="#size-guide" className="text-sm hover:text-secondary transition-colors">{t('nav.size_guide')}</a>
                 </div>
               </div>

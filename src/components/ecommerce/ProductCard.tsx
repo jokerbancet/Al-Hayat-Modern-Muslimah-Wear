@@ -19,16 +19,23 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
   const { i18n } = useTranslation();
 
   const productName = product.name;
+  const totalStock = product.variants?.reduce((sum, v) => sum + v.stock_quantity, 0) || 0;
+  const isOutOfStock = totalStock === 0;
 
   const handleQuickAdd = () => {
+    if (isOutOfStock) return;
+    // For quick add, we pick the first available variant
+    const firstVariant = product.variants?.[0];
+    if (!firstVariant) return;
+
     onAddToCart({
       id: product.id,
       name: product.name,
       price: product.base_price,
-      image: product.images?.[0]?.url || '',
-      variantId: `${product.id}-default`,
-      selectedSize: 'M',
-      selectedColor: 'Sand',
+      image: product.images?.[0]?.image_url || '',
+      variantId: firstVariant.id,
+      selectedSize: firstVariant.size_option,
+      selectedColor: firstVariant.color_option,
       quantity: 1,
     });
   };
@@ -46,20 +53,28 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       >
         <div className="aspect-[3/4] overflow-hidden relative">
           <motion.img
-            src={product.images?.[0]?.url || ''}
+            src={product.images?.[0]?.image_url || ''}
             alt={productName}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isOutOfStock ? 'grayscale opacity-60' : ''}`}
             referrerPolicy="no-referrer"
           />
           
-          {product.is_featured && (
+          {product.is_featured && !isOutOfStock && (
             <Badge className="absolute top-4 left-4 bg-secondary text-primary border-none font-semibold tracking-widest text-[10px] uppercase px-3 py-1">
               Featured
             </Badge>
           )}
 
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <Badge className="bg-destructive text-white border-none font-bold tracking-widest text-xs uppercase px-4 py-2 rounded-none">
+                Out of Stock
+              </Badge>
+            </div>
+          )}
+
           <AnimatePresence>
-            {isHovered && (
+            {isHovered && !isOutOfStock && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -89,7 +104,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
 
         <div className="mt-4 space-y-1">
           <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-            {product.category?.name}
+            {product.category?.name || 'Uncategorized'}
           </p>
           <div className="flex justify-between items-start">
             <h3 className="text-sm font-medium tracking-tight group-hover:text-secondary transition-colors">
