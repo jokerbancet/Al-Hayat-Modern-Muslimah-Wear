@@ -1,0 +1,68 @@
+{
+  "common": {
+    "shop_now": "Shop Now",
+    "add_to_cart": "Add to Cart",
+    "size_guide": "Size Guide",
+    "checkout": "Checkout",
+    "order_success": "Order Success",
+    "return_to_home": "Return to Home",
+    "essentials": "Essentials",
+    "occasion_wear": "Occasion Wear",
+    "seasonal": "Seasonal",
+    "your_bag": "Your Bag",
+    "item": "Item",
+    "items": "Items",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "checkout_now": "Checkout Now",
+    "free_shipping": "Free shipping on orders over $200",
+    "bag_empty": "Your bag is empty",
+    "start_shopping": "Start Shopping",
+    "thank_you": "THANK YOU",
+    "order_placed": "Your order has been placed successfully. We've sent a confirmation email with all the details.",
+    "curated_selection": "Curated Selection",
+    "exquisite_craftsmanship": "Exquisite Craftsmanship",
+    "contemporary_designs": "Contemporary Designs",
+    "discover_essentials": "Discover our most-loved pieces, designed for effortless elegance and timeless appeal.",
+    "discover_occasion": "For the moments that matter most. Intricate details and luxurious fabrics.",
+    "discover_seasonal": "Breathable fabrics and contemporary designs for the shifting seasons.",
+    "explore": "Explore"
+  },
+  "categories": {
+    "essentials": {
+      "name": "ESSENTIALS",
+      "description": "Timeless silhouettes for everyday elegance."
+    },
+    "occasion": {
+      "name": "OCCASION WEAR",
+      "description": "Exquisite craftsmanship for your most special moments."
+    },
+    "seasonal": {
+      "name": "SEASONAL",
+      "description": "Breathable fabrics and contemporary designs for the shifting seasons."
+    }
+  },
+  "nav": {
+    "essentials": "ESSENTIALS",
+    "occasion": "OCCASION WEAR",
+    "seasonal": "SEASONAL",
+    "size_guide": "SIZE GUIDE"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Please enter your shipping and contact details.",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "address": "Shipping Address",
+    "city": "City",
+    "postal_code": "Postal Code",
+    "proceed": "Proceed to Payment",
+    "processing": "Processing...",
+    "order_summary": "Order Summary",
+    "secure_ssl": "Secure SSL",
+    "encrypted_payment": "Encrypted Payment"
+  }
+}

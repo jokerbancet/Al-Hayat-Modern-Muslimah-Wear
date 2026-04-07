@@ -1,0 +1,93 @@
+import { Product, SizeGuide } from '../types';
+
+export const MOCK_PRODUCTS: Product[] = [
+  {
+    id: '1',
+    name: 'The Essential Abaya',
+    slug: 'the-essential-abaya',
+    description: 'A timeless silhouette crafted from premium Nidha fabric. Designed for the modern woman who values both comfort and elegance.',
+    base_price: 129,
+    category_id: 'cat1',
+    category: { id: 'cat1', name: 'Essentials', slug: 'essentials' },
+    images: [{ id: 'img1', product_id: '1', url: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&q=80&w=800', is_primary: true, display_order: 0 }],
+    is_featured: true,
+  },
+  {
+    id: '2',
+    name: 'Midnight Velvet Kaftan',
+    slug: 'midnight-velvet-kaftan',
+    description: 'Elevate your evening with our luxurious velvet kaftan, featuring intricate gold embroidery and a flowing drape.',
+    base_price: 249,
+    category_id: 'cat2',
+    category: { id: 'cat2', name: 'Occasion Wear', slug: 'occasion-wear' },
+    images: [{ id: 'img2', product_id: '2', url: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&q=80&w=800', is_primary: true, display_order: 0 }],
+    is_featured: true,
+  },
+  {
+    id: '3',
+    name: 'Sage Linen Set',
+    slug: 'sage-linen-set',
+    description: 'Breathable linen blend set perfect for seasonal transitions. Includes a relaxed-fit tunic and wide-leg trousers.',
+    base_price: 159,
+    category_id: 'cat3',
+    category: { id: 'cat3', name: 'Seasonal', slug: 'seasonal' },
+    images: [{ id: 'img3', product_id: '3', url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800', is_primary: true, display_order: 0 }],
+    is_featured: false,
+  },
+  {
+    id: '4',
+    name: 'Silk Chiffon Hijab',
+    slug: 'silk-chiffon-hijab',
+    description: 'Our signature silk chiffon hijab offers a lightweight feel and a beautiful sheen. Available in a range of earthy tones.',
+    base_price: 35,
+    category_id: 'cat1',
+    category: { id: 'cat1', name: 'Essentials', slug: 'essentials' },
+    images: [{ id: 'img4', product_id: '4', url: 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&q=80&w=800', is_primary: true, display_order: 0 }],
+    is_featured: false,
+  },
+  {
+    id: '5',
+    name: 'Ethereal Lace Gown',
+    slug: 'ethereal-lace-gown',
+    description: 'A masterpiece of delicate lace and soft tulle. Perfect for weddings and special celebrations.',
+    base_price: 389,
+    category_id: 'cat2',
+    category: { id: 'cat2', name: 'Occasion Wear', slug: 'occasion-wear' },
+    images: [{ id: 'img5', product_id: '5', url: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800', is_primary: true, display_order: 0 }],
+    is_featured: true,
+  },
+  {
+    id: '6',
+    name: 'Sand Dune Kimono',
+    slug: 'sand-dune-kimono',
+    description: 'Versatile layering piece in a warm sand hue. Effortlessly chic over any outfit.',
+    base_price: 89,
+    category_id: 'cat3',
+    category: { id: 'cat3', name: 'Seasonal', slug: 'seasonal' },
+    images: [{ id: 'img6', product_id: '6', url: 'https://images.unsplash.com/photo-1539109132314-d49c02d82267?auto=format&fit=crop&q=80&w=800', is_primary: true, display_order: 0 }],
+    is_featured: false,
+  },
+];
+
+export const MOCK_SIZE_GUIDE: SizeGuide[] = [
+  {
+    id: 'sg1',
+    category: 'Abayas',
+    measurements: [
+      { size: 'S', chest: '38"', length: '52"', sleeve: '23"' },
+      { size: 'M', chest: '40"', length: '54"', sleeve: '24"' },
+      { size: 'L', chest: '42"', length: '56"', sleeve: '25"' },
+      { size: 'XL', chest: '44"', length: '58"', sleeve: '26"' },
+    ],
+  },
+  {
+    id: 'sg2',
+    category: 'Tops & Trousers',
+    measurements: [
+      { size: 'S', chest: '36"', length: '28"', sleeve: '22"', waist: '28"' },
+      { size: 'M', chest: '38"', length: '29"', sleeve: '23"', waist: '30"' },
+      { size: 'L', chest: '40"', length: '30"', sleeve: '24"', waist: '32"' },
+      { size: 'XL', chest: '42"', length: '31"', sleeve: '25"', waist: '34"' },
+    ],
+  },
+];

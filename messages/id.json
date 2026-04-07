@@ -1,0 +1,68 @@
+{
+  "common": {
+    "shop_now": "Beli Sekarang",
+    "add_to_cart": "Tambah ke Keranjang",
+    "size_guide": "Panduan Ukuran",
+    "checkout": "Checkout",
+    "order_success": "Pesanan Berhasil",
+    "return_to_home": "Kembali ke Beranda",
+    "essentials": "Koleksi Utama",
+    "occasion_wear": "Busana Pesta",
+    "seasonal": "Koleksi Musiman",
+    "your_bag": "Keranjang Anda",
+    "item": "Barang",
+    "items": "Barang",
+    "subtotal": "Subtotal",
+    "shipping": "Pengiriman",
+    "total": "Total",
+    "checkout_now": "Bayar Sekarang",
+    "free_shipping": "Gratis ongkir untuk pesanan di atas $200",
+    "bag_empty": "Keranjang Anda kosong",
+    "start_shopping": "Mulai Belanja",
+    "thank_you": "TERIMA KASIH",
+    "order_placed": "Pesanan Anda telah berhasil ditempatkan. Kami telah mengirimkan email konfirmasi dengan semua detailnya.",
+    "curated_selection": "Pilihan Terkurasi",
+    "exquisite_craftsmanship": "Keahlian Luar Biasa",
+    "contemporary_designs": "Desain Kontemporer",
+    "discover_essentials": "Temukan koleksi favorit kami, dirancang untuk keanggunan tanpa usaha dan daya tarik abadi.",
+    "discover_occasion": "Untuk momen yang paling berarti. Detail rumit dan kain mewah.",
+    "discover_seasonal": "Kain yang sejuk dan desain kontemporer untuk perubahan musim.",
+    "explore": "Jelajahi"
+  },
+  "categories": {
+    "essentials": {
+      "name": "KOLEKSI UTAMA",
+      "description": "Siluet abadi untuk keanggunan sehari-hari."
+    },
+    "occasion": {
+      "name": "BUSANA PESTA",
+      "description": "Keahlian luar biasa untuk momen paling spesial Anda."
+    },
+    "seasonal": {
+      "name": "MUSIMAN",
+      "description": "Kain yang sejuk dan desain kontemporer untuk perubahan musim."
+    }
+  },
+  "nav": {
+    "essentials": "KOLEKSI UTAMA",
+    "occasion": "BUSANA PESTA",
+    "seasonal": "MUSIMAN",
+    "size_guide": "PANDUAN UKURAN"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Silakan masukkan detail pengiriman dan kontak Anda.",
+    "first_name": "Nama Depan",
+    "last_name": "Nama Belakang",
+    "email": "Alamat Email",
+    "phone": "Nomor Telepon",
+    "address": "Alamat Pengiriman",
+    "city": "Kota",
+    "postal_code": "Kode Pos",
+    "proceed": "Lanjutkan ke Pembayaran",
+    "processing": "Memproses...",
+    "order_summary": "Ringkasan Pesanan",
+    "secure_ssl": "SSL Aman",
+    "encrypted_payment": "Pembayaran Terenkripsi"
+  }
+}
