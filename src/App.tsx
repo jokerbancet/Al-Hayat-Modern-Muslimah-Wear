@@ -14,6 +14,7 @@ import ProtectedRoute from './components/admin/ProtectedRoute';
 import Checkout from './pages/Checkout';
 import Success from './pages/Success';
 import CategoryPage from './pages/CategoryPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 import { MOCK_PRODUCTS } from './lib/mock-data';
 import { Toaster } from './components/ui/sonner';
 import { Button } from './components/ui/button';
@@ -160,7 +161,7 @@ export default function App() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
                       {categoryProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+                        <ProductCard key={product.id} product={product} />
                       ))}
                     </div>
                   </div>
@@ -174,6 +175,7 @@ export default function App() {
         } />
         <Route path="/checkout" element={<Checkout items={cartItems} onClearCart={clearCart} />} />
         <Route path="/category/:slug" element={<CategoryPage onAddToCart={handleAddToCart} />} />
+        <Route path="/category/:categorySlug/:productSlug" element={<ProductDetailPage onAddToCart={handleAddToCart} />} />
         <Route path="/success" element={<Success />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={

@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Loader2, ChevronLeft, Layers } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, ChevronLeft, Layers, AlertTriangle, Lock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from '../ui/dialog';
 import { supabase } from '../../lib/supabase';
 import { Category } from '../../types';
 import { toast } from 'sonner';
@@ -13,6 +21,8 @@ export default function CategoryManager() {
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -23,11 +33,20 @@ export default function CategoryManager() {
     try {
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select(`
+          *,
+          products:products(count)
+        `)
         .order('name', { ascending: true });
       
       if (error) throw error;
-      setCategories(data || []);
+
+      const categoriesWithCount = data?.map(cat => ({
+        ...cat,
+        product_count: (cat as any).products?.[0]?.count || 0
+      })) || [];
+
+      setCategories(categoriesWithCount);
     } catch (error: any) {
       toast.error('Error fetching categories: ' + error.message);
     } finally {
@@ -35,20 +54,50 @@ export default function CategoryManager() {
     }
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category? This may affect products linked to it.')) return;
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+
+    // Double check count before deleting
+    if ((categoryToDelete.product_count || 0) > 0) {
+      toast.error('Cannot delete category: This category contains active products. Please reassign or delete the products first.', {
+        className: 'bg-destructive text-destructive-foreground font-bold',
+      });
+      setCategoryToDelete(null);
+      return;
+    }
+
+    setIsDeleting(true);
     try {
+      // Delete image from storage if it exists
+      if (categoryToDelete.image_url) {
+        try {
+          // Extract path from public URL
+          // Example URL: https://.../storage/v1/object/public/product-images/categories/filename.jpg
+          const urlParts = categoryToDelete.image_url.split('/product-images/');
+          if (urlParts.length > 1) {
+            const filePath = urlParts[1];
+            await supabase.storage.from('product-images').remove([filePath]);
+          }
+        } catch (storageError) {
+          console.error('Error deleting category image:', storageError);
+          // Continue with category deletion even if image deletion fails
+        }
+      }
+
       const { error } = await supabase
         .from('categories')
         .delete()
-        .eq('id', id);
+        .eq('id', categoryToDelete.id);
 
       if (error) throw error;
       
       toast.success('Category deleted');
+      setCategoryToDelete(null);
       fetchData();
     } catch (error: any) {
       toast.error('Error deleting category: ' + error.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -120,62 +169,74 @@ export default function CategoryManager() {
             <TableRow>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Name</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Slug</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Products</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Description</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Created At</TableHead>
               <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((category) => (
-              <TableRow key={category.id} className="hover:bg-muted/20 transition-colors">
-                <TableCell>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden flex items-center justify-center border">
-                      {category.image_url ? (
-                        <img src={category.image_url} alt={category.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <Layers className="w-5 h-5 text-muted-foreground" />
-                      )}
+            {categories.map((category) => {
+              const hasProducts = (category.product_count || 0) > 0;
+              return (
+                <TableRow key={category.id} className="hover:bg-muted/20 transition-colors">
+                  <TableCell>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden flex items-center justify-center border">
+                        {category.image_url ? (
+                          <img src={category.image_url} alt={category.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Layers className="w-5 h-5 text-muted-foreground" />
+                        )}
+                      </div>
+                      <p className="font-bold text-sm">{category.name}</p>
                     </div>
-                    <p className="font-bold text-sm">{category.name}</p>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="text-[10px] font-bold tracking-widest uppercase">
-                    {category.slug}
-                  </Badge>
-                </TableCell>
-                <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
-                  {category.description || '-'}
-                </TableCell>
-                <TableCell className="text-xs text-muted-foreground">
-                  {category.created_at ? new Date(category.created_at).toLocaleDateString() : '-'}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => setEditingCategory(category)}
-                      className="hover:text-secondary"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => handleDeleteCategory(category.id)}
-                      className="hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-[10px] font-bold tracking-widest uppercase">
+                      {category.slug}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-bold ${hasProducts ? 'text-primary' : 'text-muted-foreground'}`}>
+                        {category.product_count || 0}
+                      </span>
+                      {hasProducts && <Lock className="w-3 h-3 text-muted-foreground opacity-50" />}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
+                    {category.description || '-'}
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {category.created_at ? new Date(category.created_at).toLocaleDateString() : '-'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => setEditingCategory(category)}
+                        className="hover:text-secondary"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => setCategoryToDelete(category)}
+                        className={`hover:text-destructive ${hasProducts ? 'opacity-50' : ''}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
             {categories.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                   No categories found. Add your first category to get started.
                 </TableCell>
               </TableRow>
@@ -183,6 +244,59 @@ export default function CategoryManager() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
+        <DialogContent className="bg-background border-none shadow-2xl rounded-3xl p-8 max-w-md">
+          <DialogHeader className="space-y-4">
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-8 h-8 text-destructive" />
+            </div>
+            <DialogTitle className="text-3xl font-serif font-bold tracking-tight text-center">
+              Delete Category?
+            </DialogTitle>
+            <DialogDescription className="text-center text-muted-foreground leading-relaxed">
+              Are you sure you want to delete <span className="font-bold text-primary">"{categoryToDelete?.name}"</span>? 
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          {(categoryToDelete?.product_count || 0) > 0 && (
+            <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-destructive font-bold text-xs uppercase tracking-widest">
+                <Lock className="w-4 h-4" />
+                Action Blocked
+              </div>
+              <p className="text-xs text-destructive/80 leading-relaxed">
+                This category contains <span className="font-bold">{categoryToDelete?.product_count} active products</span>. 
+                You must reassign or delete these products before this category can be removed.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-8">
+            <Button
+              variant="ghost"
+              onClick={() => setCategoryToDelete(null)}
+              className="flex-1 h-12 font-bold tracking-widest uppercase text-[10px] rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteCategory}
+              disabled={isDeleting || (categoryToDelete?.product_count || 0) > 0}
+              variant="destructive"
+              className="flex-1 h-12 font-bold tracking-widest uppercase text-[10px] rounded-xl shadow-lg shadow-destructive/20"
+            >
+              {isDeleting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                'Delete Category'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

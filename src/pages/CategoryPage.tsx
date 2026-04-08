@@ -252,7 +252,6 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
                   key={product.id} 
                   product={product} 
                   viewMode={viewMode}
-                  onAddToCart={onAddToCart}
                 />
               ))}
             </div>
@@ -372,7 +371,9 @@ function FilterSidebar({
   );
 }
 
-function ProductCard({ product, viewMode, onAddToCart }: { product: Product; viewMode: 'grid' | 'list'; onAddToCart: (item: CartItem) => void }) {
+function ProductCard({ product, viewMode }: { product: Product; viewMode: 'grid' | 'list' }) {
+  const navigate = useNavigate();
+  const { slug } = useParams<{ slug: string }>();
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const totalStock = product.variants?.reduce((sum, v) => sum + v.stock_quantity, 0) || 0;
@@ -381,7 +382,8 @@ function ProductCard({ product, viewMode, onAddToCart }: { product: Product; vie
     return (
       <motion.div 
         layout
-        className="group flex flex-col md:flex-row gap-8 items-center bg-white p-6 rounded-3xl border border-primary/5 hover:border-secondary/30 transition-all duration-500"
+        className="group flex flex-col md:flex-row gap-8 items-center bg-white p-6 rounded-3xl border border-primary/5 hover:border-secondary/30 transition-all duration-500 cursor-pointer"
+        onClick={() => navigate(`/category/${slug}/${product.slug}`)}
       >
         <div className="w-full md:w-48 aspect-[4/5] rounded-2xl overflow-hidden bg-muted shrink-0 relative">
           <img 
@@ -405,26 +407,13 @@ function ProductCard({ product, viewMode, onAddToCart }: { product: Product; vie
           </div>
           <p className="text-xl font-bold tracking-tighter">Rp {product.base_price.toLocaleString()}</p>
           <Button 
-            onClick={() => {
-              // For simplicity, add the first variant or open a quick view
-              if (product.variants && product.variants.length > 0) {
-                onAddToCart({
-                  id: product.id,
-                  name: product.name,
-                  price: product.base_price,
-                  image: product.images?.[0]?.image_url || '',
-                  variantId: product.variants[0].id,
-                  selectedSize: product.variants[0].size_option,
-                  selectedColor: product.variants[0].color_option,
-                  quantity: 1
-                });
-                toast.success(`${product.name} added to cart`);
-              }
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/category/${slug}/${product.slug}`);
             }}
-            disabled={totalStock === 0}
             className="rounded-full h-12 px-8 font-bold tracking-widest uppercase text-[10px]"
           >
-            Quick Add
+            Detail Produk
           </Button>
         </div>
       </motion.div>
@@ -436,7 +425,8 @@ function ProductCard({ product, viewMode, onAddToCart }: { product: Product; vie
       layout
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group space-y-6"
+      className="group space-y-6 cursor-pointer"
+      onClick={() => navigate(`/category/${slug}/${product.slug}`)}
     >
       <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-muted">
         <img 
@@ -446,40 +436,6 @@ function ProductCard({ product, viewMode, onAddToCart }: { product: Product; vie
           className={`w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${isLoaded ? 'scale-100 blur-0' : 'scale-110 blur-xl'}`}
         />
         
-        {/* Quick Add Overlay */}
-        <AnimatePresence>
-          {isHovered && totalStock > 0 && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="absolute inset-x-4 bottom-4"
-            >
-              <Button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (product.variants && product.variants.length > 0) {
-                    onAddToCart({
-                      id: product.id,
-                      name: product.name,
-                      price: product.base_price,
-                      image: product.images?.[0]?.image_url || '',
-                      variantId: product.variants[0].id,
-                      selectedSize: product.variants[0].size_option,
-                      selectedColor: product.variants[0].color_option,
-                      quantity: 1
-                    });
-                    toast.success(`${product.name} added to cart`);
-                  }
-                }}
-                className="w-full h-12 bg-white/90 backdrop-blur-md text-primary hover:bg-white transition-all rounded-2xl font-bold tracking-widest uppercase text-[10px] shadow-xl"
-              >
-                Quick Add
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {totalStock === 0 && (
           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
             <span className="text-[10px] font-bold tracking-widest uppercase text-white border border-white/20 px-4 py-2 rounded-full backdrop-blur-md">
@@ -489,13 +445,28 @@ function ProductCard({ product, viewMode, onAddToCart }: { product: Product; vie
         )}
       </div>
 
-      <div className="space-y-2 text-center">
-        <h3 className="text-sm font-bold tracking-tight group-hover:text-secondary transition-colors uppercase">
-          {product.name}
-        </h3>
-        <p className="text-lg font-bold tracking-tighter">
-          Rp {product.base_price.toLocaleString()}
-        </p>
+      <div className="space-y-4 text-center">
+        <div className="space-y-1">
+          <h3 className="text-sm font-bold tracking-tight group-hover:text-secondary transition-colors uppercase">
+            {product.name}
+          </h3>
+          <p className="text-lg font-bold tracking-tighter">
+            Rp {product.base_price.toLocaleString()}
+          </p>
+        </div>
+        
+        <div className="pt-2">
+          <Button
+            variant="outline"
+            className="w-full h-10 border-primary text-primary font-bold tracking-widest uppercase text-[10px] rounded-none hover:bg-primary hover:text-white transition-all duration-300"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/category/${slug}/${product.slug}`);
+            }}
+          >
+            Detail Produk
+          </Button>
+        </div>
       </div>
     </motion.div>
   );

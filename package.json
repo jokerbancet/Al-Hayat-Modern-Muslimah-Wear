@@ -37,6 +37,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.72.1",
     "react-i18next": "^17.0.2",
+    "react-inner-image-zoom": "^4.0.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.14.0",
     "shadcn": "^4.1.2",

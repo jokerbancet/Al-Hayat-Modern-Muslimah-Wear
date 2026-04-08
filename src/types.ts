@@ -5,6 +5,7 @@ export interface Category {
   description?: string;
   image_url?: string;
   created_at?: string;
+  product_count?: number;
 }
 
 export interface Product {

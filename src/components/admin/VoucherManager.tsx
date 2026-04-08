@@ -18,7 +18,9 @@ export default function VoucherManager() {
     discount_type: 'percentage',
     discount_value: 0,
     min_spend: 0,
-    is_active: true
+    is_active: true,
+    times_used: 0,
+    usage_limit: null as number | null
   });
 
   useEffect(() => {
@@ -53,7 +55,15 @@ export default function VoucherManager() {
       
       toast.success('Voucher created successfully');
       setIsAdding(false);
-      setNewVoucher({ code: '', discount_type: 'percentage', discount_value: 0, min_spend: 0, is_active: true });
+      setNewVoucher({ 
+        code: '', 
+        discount_type: 'percentage', 
+        discount_value: 0, 
+        min_spend: 0, 
+        is_active: true, 
+        times_used: 0, 
+        usage_limit: null 
+      });
       fetchVouchers();
     } catch (error: any) {
       toast.error('Error creating voucher: ' + error.message);
@@ -134,8 +144,8 @@ export default function VoucherManager() {
                 <Input 
                   required
                   type="number"
-                  value={newVoucher.discount_value}
-                  onChange={(e) => setNewVoucher({ ...newVoucher, discount_value: parseFloat(e.target.value) })}
+                  value={newVoucher.discount_value || ''}
+                  onChange={(e) => setNewVoucher({ ...newVoucher, discount_value: e.target.value ? parseFloat(e.target.value) : 0 })}
                   placeholder="0.00" 
                   className="h-12 pl-10"
                 />
@@ -148,9 +158,19 @@ export default function VoucherManager() {
               <Label className="text-[10px] font-bold tracking-widest uppercase">Minimum Spend (IDR)</Label>
               <Input 
                 type="number"
-                value={newVoucher.min_spend}
-                onChange={(e) => setNewVoucher({ ...newVoucher, min_spend: parseFloat(e.target.value) })}
+                value={newVoucher.min_spend || ''}
+                onChange={(e) => setNewVoucher({ ...newVoucher, min_spend: e.target.value ? parseFloat(e.target.value) : 0 })}
                 placeholder="0" 
+                className="h-12"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Usage Limit (Optional)</Label>
+              <Input 
+                type="number"
+                value={newVoucher.usage_limit || ''}
+                onChange={(e) => setNewVoucher({ ...newVoucher, usage_limit: e.target.value ? parseInt(e.target.value) : null })}
+                placeholder="Unlimited" 
                 className="h-12"
               />
             </div>
