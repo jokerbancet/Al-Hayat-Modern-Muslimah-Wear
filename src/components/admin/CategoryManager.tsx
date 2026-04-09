@@ -184,7 +184,7 @@ export default function CategoryManager() {
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden flex items-center justify-center border">
                         {category.image_url ? (
-                          <img src={category.image_url} alt={category.name} className="w-full h-full object-cover" />
+                          <img src={category.image_url || undefined} alt={category.name} className="w-full h-full object-cover" />
                         ) : (
                           <Layers className="w-5 h-5 text-muted-foreground" />
                         )}

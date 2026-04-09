@@ -61,7 +61,7 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
                   <div key={itemKey} className="flex gap-6 group">
                     <div className="w-24 aspect-[3/4] bg-muted overflow-hidden shrink-0">
                       <img
-                        src={item.image}
+                        src={item.image || undefined}
                         alt={itemName}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         referrerPolicy="no-referrer"
@@ -80,9 +80,21 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                        <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-                          {item.selectedColor} / {item.selectedSize}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+                            {item.selectedColor} / {item.selectedSize}
+                          </p>
+                          {item.selectedColorSwatchUrl && (
+                            <div className="w-4 h-4 rounded border border-[#2D2D2D]/10 overflow-hidden shrink-0">
+                              <img 
+                                src={item.selectedColorSwatchUrl || undefined} 
+                                alt={item.selectedColor} 
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="flex justify-between items-center">

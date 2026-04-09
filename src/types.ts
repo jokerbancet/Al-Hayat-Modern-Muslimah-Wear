@@ -8,6 +8,19 @@ export interface Category {
   product_count?: number;
 }
 
+export interface HeroBanner {
+  id: string;
+  image_url: string;
+  display_order: number;
+  is_active: boolean;
+  main_title: string;
+  sub_title: string;
+  button_text: string;
+  button_link: string;
+  show_button: boolean;
+  created_at?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -29,8 +42,10 @@ export interface ProductVariant {
   id: string;
   product_id: string;
   color_option: string;
+  color_swatch_url: string;
   size_option: string;
   stock_quantity: number;
+  color_hex?: string;    // For backward compatibility
 }
 
 export interface ProductImage {
@@ -60,5 +75,6 @@ export interface CartItem {
   variantId: string;
   selectedSize: string;
   selectedColor: string;
+  selectedColorSwatchUrl?: string;
   quantity: number;
 }

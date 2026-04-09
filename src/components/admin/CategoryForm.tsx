@@ -136,7 +136,7 @@ export default function CategoryForm({ onSuccess, onCancel, initialData }: Categ
             <div className="relative aspect-[4/5] bg-muted/30 rounded-2xl border-2 border-dashed border-primary/10 flex flex-col items-center justify-center overflow-hidden group transition-all hover:border-primary/30">
               {imageUrl ? (
                 <>
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <img src={imageUrl || undefined} alt="Preview" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Button 
                       type="button" 

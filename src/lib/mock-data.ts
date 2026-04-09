@@ -15,8 +15,8 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [{ id: 'img1', product_id: '1', image_url: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&q=80&w=800', display_order: 0 }],
     is_featured: true,
     variants: [
-      { id: 'v1', product_id: '1', color_option: 'Black', size_option: 'M', stock_quantity: 15 },
-      { id: 'v2', product_id: '1', color_option: 'Navy', size_option: 'L', stock_quantity: 8 }
+      { id: 'v1', product_id: '1', color_option: 'Black', color_swatch_url: 'https://placehold.co/100x100?text=Black', size_option: 'M', stock_quantity: 15 },
+      { id: 'v2', product_id: '1', color_option: 'Navy', color_swatch_url: 'https://placehold.co/100x100?text=Navy', size_option: 'L', stock_quantity: 8 }
     ]
   },
   {
@@ -33,7 +33,7 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [{ id: 'img2', product_id: '2', image_url: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&q=80&w=800', display_order: 0 }],
     is_featured: true,
     variants: [
-      { id: 'v3', product_id: '2', color_option: 'Midnight', size_option: 'One Size', stock_quantity: 5 }
+      { id: 'v3', product_id: '2', color_option: 'Midnight', color_swatch_url: 'https://placehold.co/100x100?text=Midnight', size_option: 'One Size', stock_quantity: 5 }
     ]
   },
   {
@@ -50,7 +50,7 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [{ id: 'img3', product_id: '3', image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800', display_order: 0 }],
     is_featured: false,
     variants: [
-      { id: 'v4', product_id: '3', color_option: 'Sage', size_option: 'S', stock_quantity: 12 }
+      { id: 'v4', product_id: '3', color_option: 'Sage', color_swatch_url: 'https://placehold.co/100x100?text=Sage', size_option: 'S', stock_quantity: 12 }
     ]
   },
   {
@@ -67,7 +67,7 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [{ id: 'img4', product_id: '4', image_url: 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&q=80&w=800', display_order: 0 }],
     is_featured: false,
     variants: [
-      { id: 'v5', product_id: '4', color_option: 'Sand', size_option: 'One Size', stock_quantity: 50 }
+      { id: 'v5', product_id: '4', color_option: 'Sand', color_swatch_url: 'https://placehold.co/100x100?text=Sand', size_option: 'One Size', stock_quantity: 50 }
     ]
   },
   {
@@ -84,7 +84,7 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [{ id: 'img5', product_id: '5', image_url: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800', display_order: 0 }],
     is_featured: true,
     variants: [
-      { id: 'v6', product_id: '5', color_option: 'White', size_option: 'M', stock_quantity: 3 }
+      { id: 'v6', product_id: '5', color_option: 'White', color_swatch_url: 'https://placehold.co/100x100?text=White', size_option: 'M', stock_quantity: 3 }
     ]
   },
   {
@@ -101,7 +101,7 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [{ id: 'img6', product_id: '6', image_url: 'https://images.unsplash.com/photo-1539109132314-d49c02d82267?auto=format&fit=crop&q=80&w=800', display_order: 0 }],
     is_featured: false,
     variants: [
-      { id: 'v7', product_id: '6', color_option: 'Sand', size_option: 'One Size', stock_quantity: 0 }
+      { id: 'v7', product_id: '6', color_option: 'Sand', color_swatch_url: 'https://placehold.co/100x100?text=Sand', size_option: 'One Size', stock_quantity: 0 }
     ]
   },
 ];

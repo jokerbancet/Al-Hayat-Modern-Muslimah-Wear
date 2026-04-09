@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       <div className="aspect-[3/4] overflow-hidden relative cursor-pointer">
         <motion.img
-          src={product.images?.[0]?.image_url || ''}
+          src={product.images?.[0]?.image_url || undefined}
           alt={productName}
           className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isOutOfStock ? 'grayscale opacity-60' : ''}`}
           referrerPolicy="no-referrer"

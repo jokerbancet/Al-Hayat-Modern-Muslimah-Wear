@@ -188,14 +188,14 @@ app.post("/api/webhooks/midtrans", async (req, res) => {
         // Assuming item has variantId
         const { data: variant, error: variantError } = await supabase
           .from("variants")
-          .select("stock")
+          .select("stock_quantity")
           .eq("id", item.variantId)
           .single();
 
         if (variant && !variantError) {
           await supabase
             .from("variants")
-            .update({ stock: Math.max(0, variant.stock - item.quantity) })
+            .update({ stock_quantity: Math.max(0, variant.stock_quantity - item.quantity) })
             .eq("id", item.variantId);
         }
       }

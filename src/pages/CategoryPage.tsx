@@ -387,7 +387,7 @@ function ProductCard({ product, viewMode }: { product: Product; viewMode: 'grid'
       >
         <div className="w-full md:w-48 aspect-[4/5] rounded-2xl overflow-hidden bg-muted shrink-0 relative">
           <img 
-            src={product.images?.[0]?.image_url} 
+            src={product.images?.[0]?.image_url || undefined} 
             alt={product.name} 
             onLoad={() => setIsLoaded(true)}
             className={`w-full h-full object-cover transition-all duration-700 ${isLoaded ? 'scale-100 blur-0' : 'scale-110 blur-xl'}`}
@@ -430,7 +430,7 @@ function ProductCard({ product, viewMode }: { product: Product; viewMode: 'grid'
     >
       <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-muted">
         <img 
-          src={product.images?.[0]?.image_url} 
+          src={product.images?.[0]?.image_url || undefined} 
           alt={product.name} 
           onLoad={() => setIsLoaded(true)}
           className={`w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${isLoaded ? 'scale-100 blur-0' : 'scale-110 blur-xl'}`}

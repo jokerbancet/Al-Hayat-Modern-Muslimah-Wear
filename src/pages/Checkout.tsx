@@ -248,13 +248,25 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
                 return (
                   <div key={item.id} className="flex gap-4">
                     <div className="w-16 aspect-[3/4] bg-muted overflow-hidden shrink-0">
-                      <img src={item.image} alt={itemName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={item.image || undefined} alt={itemName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-bold">{itemName}</p>
-                      <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-                        {item.selectedColor} / {item.selectedSize} × {item.quantity}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+                          {item.selectedColor} / {item.selectedSize} × {item.quantity}
+                        </p>
+                        {item.selectedColorSwatchUrl && (
+                          <div className="w-3 h-3 rounded border border-[#2D2D2D]/10 overflow-hidden shrink-0">
+                            <img 
+                              src={item.selectedColorSwatchUrl || undefined} 
+                              alt={item.selectedColor} 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <p className="text-sm font-bold">{formatCurrency(item.price * item.quantity)}</p>
                   </div>

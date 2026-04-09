@@ -21,11 +21,18 @@ const productSchema = z.object({
   images: z.array(z.object({
     url: z.string().url('Invalid image URL'),
   })).min(1, 'Minimum 1 image required').max(10, 'Maximum 10 images allowed'),
-  variants: z.array(z.object({
-    color_option: z.string().min(1, 'Color is required'),
-    size_option: z.string().min(1, 'Size is required'),
-    stock_quantity: z.number().min(0, 'Stock must be 0 or more'),
-  })).min(1, 'At least one variant is required'),
+  color_variants: z.array(z.object({
+    color_option: z.string().min(1, 'Color name is required'),
+    color_swatch_url: z.string().url('Invalid swatch URL'),
+    sizes: z.object({
+      XS: z.number().min(0).default(0),
+      S: z.number().min(0).default(0),
+      M: z.number().min(0).default(0),
+      L: z.number().min(0).default(0),
+      XL: z.number().min(0).default(0),
+      XXL: z.number().min(0).default(0),
+    }),
+  })).min(1, 'At least one color variant is required'),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -58,11 +65,27 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     setValue,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema) as any,
     defaultValues: initialData ? {
       ...initialData,
       images: initialData.images?.map((img: any) => ({ url: img.image_url })) || [],
-      variants: initialData.variants || [{ color_option: '', size_option: '', stock_quantity: 0 }],
+      color_variants: (() => {
+        const grouped: Record<string, any> = {};
+        (initialData.variants || []).forEach((v: any) => {
+          const colorKey = v.color_option;
+          if (!grouped[colorKey]) {
+            grouped[colorKey] = {
+              color_option: colorKey,
+              color_swatch_url: v.color_swatch_url || '',
+              sizes: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0 }
+            };
+          }
+          if (['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(v.size_option)) {
+            grouped[colorKey].sizes[v.size_option] = v.stock_quantity;
+          }
+        });
+        return Object.values(grouped);
+      })(),
     } : {
       name: '',
       slug: '',
@@ -73,7 +96,11 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
       material: '',
       description: '',
       images: [],
-      variants: [{ color_option: '', size_option: '', stock_quantity: 0 }],
+      color_variants: [{ 
+        color_option: '', 
+        color_swatch_url: '', 
+        sizes: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0 } 
+      }],
     },
   });
 
@@ -82,9 +109,9 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     name: 'images',
   });
 
-  const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({
+  const { fields: colorFields, append: appendColor, remove: removeColor } = useFieldArray({
     control,
-    name: 'variants',
+    name: 'color_variants',
   });
 
   const productName = watch('name');
@@ -154,14 +181,25 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
       if (initialData) {
         await supabase.from('variants').delete().eq('product_id', productId);
       }
+      
+      const flatVariants: any[] = [];
+      values.color_variants.forEach(cv => {
+        Object.entries(cv.sizes).forEach(([size, stock]) => {
+          if (stock > 0 || true) { // We insert all sizes even if 0 for the matrix to work consistently
+            flatVariants.push({
+              product_id: productId,
+              color_option: cv.color_option,
+              color_swatch_url: cv.color_swatch_url,
+              size_option: size,
+              stock_quantity: stock,
+            });
+          }
+        });
+      });
+
       const { error: varError } = await supabase
         .from('variants')
-        .insert(values.variants.map(v => ({
-          product_id: productId,
-          color_option: v.color_option,
-          size_option: v.size_option,
-          stock_quantity: v.stock_quantity,
-        })));
+        .insert(flatVariants);
       if (varError) throw varError;
 
       toast.success(initialData ? 'Product updated successfully' : 'Product created successfully');
@@ -217,8 +255,39 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     }
   };
 
+  const handleSwatchUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `swatch-${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `swatches/${fileName}`;
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      setValue(`color_variants.${index}.color_swatch_url`, publicUrl);
+      toast.success('Swatch uploaded successfully');
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast.error('Error uploading swatch: ' + error.message);
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+    <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-12">
       {/* Basic Info Section */}
       <div className="bg-white p-8 border rounded-xl shadow-sm space-y-6">
         <h3 className="text-xl font-serif font-bold border-b pb-4">Basic Information</h3>
@@ -310,7 +379,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
             {imageFields.map((field, index) => (
               <div key={field.id} className="relative group aspect-[3/4] bg-muted rounded-lg overflow-hidden border">
                 <img 
-                  src={watch(`images.${index}.url`)} 
+                  src={watch(`images.${index}.url`) || undefined} 
                   alt={`Product ${index + 1}`} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -355,57 +424,125 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
       {/* Variant Manager Section */}
       <div className="bg-white p-8 border rounded-xl shadow-sm space-y-6">
         <div className="flex justify-between items-center border-b pb-4">
-          <h3 className="text-xl font-serif font-bold">Inventory & Variants</h3>
+          <h3 className="text-xl font-serif font-bold">Inventory Matrix</h3>
           <Button 
             type="button" 
             variant="outline" 
-            onClick={() => appendVariant({ color_option: '', size_option: '', stock_quantity: 0 })}
+            onClick={() => appendColor({ 
+              color_option: '', 
+              color_swatch_url: '', 
+              sizes: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0 } 
+            })}
             className="h-10 text-[10px] font-bold tracking-widest uppercase"
           >
-            <Plus className="w-3 h-3 mr-2" /> Add Variant
+            <Plus className="w-3 h-3 mr-2" /> Add Color
           </Button>
         </div>
 
-        <div className="space-y-4">
-          {variantFields.map((field, index) => (
-            <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end p-4 border rounded-lg bg-muted/20">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold tracking-widest uppercase">Color</Label>
-                <Input {...register(`variants.${index}.color_option`)} placeholder="e.g. Midnight Blue" className="h-10 bg-white" />
+        <div className="space-y-8">
+          {colorFields.map((field, index) => (
+            <div key={field.id} className="space-y-6 p-6 border rounded-xl bg-muted/5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold tracking-widest uppercase">Color Name</Label>
+                    <Input 
+                      {...register(`color_variants.${index}.color_option`)} 
+                      placeholder="e.g. Midnight Blue" 
+                      className="h-12" 
+                    />
+                    {errors.color_variants?.[index]?.color_option && (
+                      <p className="text-xs text-destructive">{errors.color_variants[index].color_option.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold tracking-widest uppercase">Swatch Image URL</Label>
+                    <Input 
+                      {...register(`color_variants.${index}.color_swatch_url`)} 
+                      placeholder="https://..." 
+                      className="h-12" 
+                    />
+                    {errors.color_variants?.[index]?.color_swatch_url && (
+                      <p className="text-xs text-destructive">{errors.color_variants[index].color_swatch_url.message}</p>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-4 relative group">
+                  <Label className="text-[10px] font-bold tracking-widest uppercase mb-4">Swatch Preview</Label>
+                  {watch(`color_variants.${index}.color_swatch_url`) ? (
+                    <div className="w-24 h-24 rounded-lg border overflow-hidden shadow-sm relative">
+                      <img 
+                        src={watch(`color_variants.${index}.color_swatch_url`) || undefined} 
+                        alt="Swatch Preview" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=Invalid+URL';
+                        }}
+                      />
+                      <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <Upload className="w-6 h-6 text-white" />
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="absolute inset-0 opacity-0 cursor-pointer" 
+                          onChange={(e) => handleSwatchUpload(e, index)}
+                          disabled={isUploading}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <label className="w-24 h-24 rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer relative">
+                      {isUploading ? (
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                      ) : (
+                        <Upload className="w-6 h-6" />
+                      )}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="absolute inset-0 opacity-0 cursor-pointer" 
+                        onChange={(e) => handleSwatchUpload(e, index)}
+                        disabled={isUploading}
+                      />
+                    </label>
+                  )}
+                  <p className="mt-2 text-[8px] font-bold uppercase tracking-widest text-muted-foreground">
+                    {isUploading ? 'Uploading...' : 'Click to Upload Swatch'}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold tracking-widest uppercase">Size</Label>
-                <select 
-                  {...register(`variants.${index}.size_option`)}
-                  className="w-full h-10 px-4 border rounded-md bg-white text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                >
-                  <option value="">Select Size</option>
-                  <option value="XS">XS</option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
-                  <option value="XXL">XXL</option>
-                  <option value="One Size">One Size</option>
-                </select>
+
+              <div className="space-y-4">
+                <Label className="text-[10px] font-bold tracking-widest uppercase">Stock per Size</Label>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                  {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                    <div key={size} className="space-y-2">
+                      <div className="text-center font-bold text-[10px] tracking-widest uppercase text-muted-foreground border-b pb-1 mb-2">{size}</div>
+                      <Input 
+                        type="number" 
+                        {...register(`color_variants.${index}.sizes.${size}` as any, { valueAsNumber: true })} 
+                        className="h-12 text-center font-bold" 
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold tracking-widest uppercase">Stock Quantity</Label>
-                <Input type="number" {...register(`variants.${index}.stock_quantity`, { valueAsNumber: true })} className="h-10 bg-white" />
-              </div>
-              <div className="flex gap-2">
+
+              <div className="flex justify-end pt-4">
                 <Button 
                   type="button" 
                   variant="ghost" 
-                  onClick={() => removeVariant(index)}
-                  className="h-10 text-destructive hover:bg-destructive/10"
+                  onClick={() => removeColor(index)}
+                  className="h-10 text-destructive hover:bg-destructive/10 font-bold text-[10px] uppercase tracking-widest"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4 mr-2" /> Remove Color
                 </Button>
               </div>
             </div>
           ))}
-          {errors.variants && <p className="text-xs text-destructive">{errors.variants.message}</p>}
+          {errors.color_variants && <p className="text-xs text-destructive">{errors.color_variants.message}</p>}
         </div>
       </div>
 

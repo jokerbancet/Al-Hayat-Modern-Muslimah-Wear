@@ -33,6 +33,8 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [hoveredSwatchUrl, setHoveredSwatchUrl] = useState<string | null>(null);
+  const [showVariantImage, setShowVariantImage] = useState(false);
   
   // Selection States
   const [selectedColor, setSelectedColor] = useState<string>('');
@@ -63,11 +65,11 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
       if (prodError) throw prodError;
       setProduct(prodData);
 
-      // Set initial selections
-      if (prodData.variants && prodData.variants.length > 0) {
-        setSelectedColor(prodData.variants[0].color_option);
-        setSelectedSize(prodData.variants[0].size_option);
-      }
+      // Set initial selections - removed auto-selection of color swatches
+      // if (prodData.variants && prodData.variants.length > 0) {
+      //   setSelectedColor(prodData.variants[0].color_option);
+      //   setSelectedSize(prodData.variants[0].size_option);
+      // }
 
       // Fetch Recommended Products (same category, excluding current)
       const { data: recData, error: recError } = await supabase
@@ -99,15 +101,31 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
     return product.variants
       ?.filter(v => v.color_option === selectedColor)
       .sort((a, b) => {
-        const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+        const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
         return sizes.indexOf(a.size_option) - sizes.indexOf(b.size_option);
       }) || [];
   }, [product, selectedColor]);
 
   const availableColors = useMemo(() => {
     if (!product) return [];
-    const colors = new Set(product.variants?.map(v => v.color_option));
-    return Array.from(colors);
+    const colorMap = new Map<string, { name: string; swatch_url: string; isOutOfStock: boolean }>();
+    
+    product.variants?.forEach(v => {
+      const colorName = v.color_option;
+      const existing = colorMap.get(colorName);
+      
+      if (!existing || (!existing.swatch_url && v.color_swatch_url)) {
+        const colorVariants = product.variants?.filter(variant => variant.color_option === colorName) || [];
+        const totalStock = colorVariants.reduce((sum, variant) => sum + variant.stock_quantity, 0);
+        
+        colorMap.set(colorName, {
+          name: colorName,
+          swatch_url: v.color_swatch_url || (existing?.swatch_url || ''),
+          isOutOfStock: totalStock === 0
+        });
+      }
+    });
+    return Array.from(colorMap.values());
   }, [product]);
 
   const currentVariant = useMemo(() => {
@@ -145,6 +163,7 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
       variantId: currentVariant.id,
       selectedSize,
       selectedColor,
+      selectedColorSwatchUrl: currentVariant.color_swatch_url,
       quantity
     });
     toast.success(`${product.name} added to cart`);
@@ -160,8 +179,10 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
 
   if (!product) return null;
 
+  const displayImageUrl = hoveredSwatchUrl || (showVariantImage ? currentVariant?.color_swatch_url : null) || product.images?.[activeImageIndex]?.image_url;
+
   return (
-    <div className="min-h-screen bg-background pt-32 pb-24">
+    <div className="min-h-screen bg-[#FDF8F8] pt-32 pb-24">
       <div className="container mx-auto px-6">
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 mb-12 text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
@@ -175,26 +196,54 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
           {/* Left Column: Media Gallery */}
           <div className="space-y-6">
-            <div className="aspect-[3/4] bg-white rounded-3xl overflow-hidden border border-primary/5 relative group">
-              <InnerImageZoom
-                src={product.images?.[activeImageIndex]?.image_url || ''}
-                zoomSrc={product.images?.[activeImageIndex]?.image_url || ''}
-                zoomType="hover"
-                zoomScale={1.5}
-                className="w-full h-full object-cover"
-              />
+            <div className="aspect-[3/4] bg-white rounded-3xl overflow-hidden border border-primary/5 relative group flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                {displayImageUrl ? (
+                  <motion.div 
+                    key={displayImageUrl}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full h-full"
+                  >
+                    <InnerImageZoom
+                      src={displayImageUrl}
+                      zoomSrc={displayImageUrl}
+                      imgAttributes={{ 
+                        alt: product.name,
+                        referrerPolicy: "no-referrer"
+                      }}
+                      className="w-full h-full object-cover"
+                      zoomType="hover"
+                      zoomScale={1.5}
+                      hideHint={true}
+                    />
+                  </motion.div>
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <ShoppingBag className="w-12 h-12 text-muted-foreground/20" />
+                  </div>
+                )}
+              </AnimatePresence>
               
               {/* Navigation Arrows */}
               {product.images && product.images.length > 1 && (
                 <>
                   <button 
-                    onClick={() => setActiveImageIndex(prev => (prev === 0 ? product.images!.length - 1 : prev - 1))}
+                    onClick={() => {
+                      setActiveImageIndex(prev => (prev === 0 ? product.images!.length - 1 : prev - 1));
+                      setShowVariantImage(false);
+                    }}
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-primary opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button 
-                    onClick={() => setActiveImageIndex(prev => (prev === product.images!.length - 1 ? 0 : prev + 1))}
+                    onClick={() => {
+                      setActiveImageIndex(prev => (prev === product.images!.length - 1 ? 0 : prev + 1));
+                      setShowVariantImage(false);
+                    }}
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-primary opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -208,12 +257,15 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
               {product.images?.map((image, index) => (
                 <button
                   key={image.id}
-                  onClick={() => setActiveImageIndex(index)}
+                  onClick={() => {
+                    setActiveImageIndex(index);
+                    setShowVariantImage(false);
+                  }}
                   className={`w-20 aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all shrink-0 ${
-                    activeImageIndex === index ? 'border-secondary' : 'border-transparent opacity-60 hover:opacity-100'
+                    !showVariantImage && activeImageIndex === index ? 'border-secondary' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <img src={image.image_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <img src={image.image_url || undefined} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 </button>
               ))}
             </div>
@@ -265,26 +317,42 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
             </div>
 
             {/* Variant Selectors */}
-            <div className="space-y-8">
+            <div className="space-y-10">
               {/* Color Selector */}
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-[10px] font-bold tracking-widest uppercase">Color: <span className="text-muted-foreground font-medium">{selectedColor}</span></h4>
+                  <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#2D2D2D]">Warna: <span className="text-muted-foreground font-medium">{selectedColor}</span></h4>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   {availableColors.map((color) => (
                     <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center ${
-                        selectedColor === color ? 'border-primary ring-2 ring-primary/10' : 'border-transparent hover:border-primary/20'
+                      key={color.name}
+                      onClick={() => {
+                        setSelectedColor(color.name);
+                        setShowVariantImage(true);
+                      }}
+                      onMouseEnter={() => setHoveredSwatchUrl(color.swatch_url)}
+                      onMouseLeave={() => setHoveredSwatchUrl(null)}
+                      className={`flex items-center gap-3 px-4 py-2 rounded-xl border-2 transition-all group ${
+                        selectedColor === color.name 
+                          ? 'border-[#2D2D2D] bg-white shadow-[4px_4px_0px_0px_rgba(45,45,45,1)]' 
+                          : 'border-[#2D2D2D]/10 bg-white/50 hover:border-[#2D2D2D]/30'
                       }`}
-                      title={color}
                     >
-                      <div 
-                        className="w-7 h-7 rounded-full border border-black/5" 
-                        style={{ backgroundColor: color.toLowerCase().replace(' ', '') }} 
-                      />
+                      <div className={`w-8 h-8 rounded-lg overflow-hidden border border-[#2D2D2D]/10 shrink-0 ${color.isOutOfStock ? 'grayscale opacity-50' : ''}`}>
+                        <img 
+                          src={color.swatch_url || undefined} 
+                          alt={color.name} 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=' + color.name[0];
+                          }}
+                        />
+                      </div>
+                      <span className={`text-xs font-bold tracking-tight ${color.isOutOfStock ? 'text-muted-foreground/60' : 'text-[#2D2D2D]'}`}>
+                        {color.name}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -293,8 +361,8 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
               {/* Size Selector */}
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-[10px] font-bold tracking-widest uppercase">Size: <span className="text-muted-foreground font-medium">{selectedSize}</span></h4>
-                  <button className="text-[8px] font-bold tracking-widest uppercase text-secondary hover:underline">Size Guide</button>
+                  <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#2D2D2D]">Ukuran: <span className="text-muted-foreground font-medium">{selectedSize}</span></h4>
+                  <button className="text-[8px] font-bold tracking-widest uppercase text-[#2D2D2D] hover:underline">Size Guide</button>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {variantsForColor.map((variant) => {
@@ -308,16 +376,16 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
                         onClick={() => setSelectedSize(variant.size_option)}
                         className={`relative w-14 h-14 rounded-xl border-2 font-bold transition-all flex items-center justify-center overflow-hidden ${
                           isSelected 
-                            ? 'border-primary bg-primary text-white shadow-lg shadow-primary/20' 
+                            ? 'border-[#2D2D2D] bg-[#2D2D2D] text-white shadow-[4px_4px_0px_0px_rgba(45,45,45,0.2)]' 
                             : isOutOfStock
-                              ? 'border-primary/5 bg-secondary/5 text-muted-foreground/40 cursor-not-allowed'
-                              : 'border-primary/10 bg-secondary/10 text-primary hover:border-primary/30'
+                              ? 'border-[#2D2D2D]/5 bg-[#2D2D2D]/5 text-muted-foreground/40 cursor-not-allowed'
+                              : 'border-[#2D2D2D]/10 bg-white text-[#2D2D2D] hover:border-[#2D2D2D]/30'
                         }`}
                       >
                         <span className="relative z-10">{variant.size_option}</span>
                         {isOutOfStock && (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-[140%] h-[2px] bg-muted-foreground/20 rotate-45 absolute" />
+                            <div className="w-[140%] h-[2px] bg-[#2D2D2D]/20 rotate-45 absolute" />
                           </div>
                         )}
                       </button>
@@ -351,7 +419,11 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
                   className="flex-1 h-16 bg-secondary text-primary font-bold tracking-[0.2em] uppercase hover:bg-secondary/90 transition-all duration-300 rounded-2xl shadow-xl shadow-secondary/10 gap-3"
                 >
                   <ShoppingBag className="w-5 h-5" />
-                  {currentVariant?.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
+                  {!selectedColor || !selectedSize 
+                    ? 'Select Color & Size' 
+                    : currentVariant?.stock_quantity === 0 
+                      ? 'Out of Stock' 
+                      : 'Add to Cart'}
                 </Button>
               </div>
 

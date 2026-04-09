@@ -190,7 +190,7 @@ export default function InventoryManager() {
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-16 bg-muted rounded overflow-hidden flex items-center justify-center">
                       {product.images && product.images.length > 0 ? (
-                        <img src={product.images[0].image_url} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        <img src={product.images[0].image_url || undefined} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
                         <ImageIcon className="w-6 h-6 text-muted-foreground" />
                       )}
