@@ -182,11 +182,11 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
   const displayImageUrl = hoveredSwatchUrl || (showVariantImage ? currentVariant?.color_swatch_url : null) || product.images?.[activeImageIndex]?.image_url;
 
   return (
-    <div className="min-h-screen bg-[#FDF8F8] pt-32 pb-24">
+    <div className="min-h-screen bg-background pt-32 pb-24">
       <div className="container mx-auto px-6">
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 mb-12 text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-          <button onClick={() => navigate('/')} className="hover:text-primary transition-colors">Home</button>
+          <button onClick={() => navigate('/')} className="hover:text-primary transition-colors">Beranda</button>
           <ChevronRight className="w-3 h-3" />
           <button onClick={() => navigate(`/category/${categorySlug}`)} className="hover:text-primary transition-colors">{product.category?.name}</button>
           <ChevronRight className="w-3 h-3" />
@@ -275,12 +275,12 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
           <div className="space-y-12">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase">
-                  {product.category?.name} Collection
+                <p className="text-[10px] font-bold tracking-[0.3em] text-primary/60 uppercase">
+                  Koleksi {product.category?.name}
                 </p>
                 {currentVariant && currentVariant.stock_quantity < 5 && currentVariant.stock_quantity > 0 && (
                   <Badge className="bg-orange-100 text-orange-600 border-none text-[8px] font-bold tracking-widest uppercase">
-                    Only {currentVariant.stock_quantity} left
+                    Tersisa {currentVariant.stock_quantity}
                   </Badge>
                 )}
               </div>
@@ -295,7 +295,7 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
             {/* Attributes */}
             <div className="grid grid-cols-3 gap-8 py-8 border-y border-primary/10">
               <div className="space-y-1">
-                <p className="text-[8px] font-bold tracking-widest uppercase text-muted-foreground">Age Category</p>
+                <p className="text-[8px] font-bold tracking-widest uppercase text-muted-foreground">Kategori Usia</p>
                 <p className="text-sm font-bold">{product.age_category}</p>
               </div>
               <div className="space-y-1">
@@ -303,14 +303,14 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
                 <p className="text-sm font-bold">{product.motif}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-[8px] font-bold tracking-widest uppercase text-muted-foreground">Material</p>
+                <p className="text-[8px] font-bold tracking-widest uppercase text-muted-foreground">Bahan</p>
                 <p className="text-sm font-bold">{product.material}</p>
               </div>
             </div>
 
             {/* Description */}
             <div className="space-y-4">
-              <h4 className="text-[10px] font-bold tracking-widest uppercase">Description</h4>
+              <h4 className="text-[10px] font-bold tracking-widest uppercase">Deskripsi</h4>
               <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none">
                 {product.description}
               </div>
@@ -362,7 +362,7 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#2D2D2D]">Ukuran: <span className="text-muted-foreground font-medium">{selectedSize}</span></h4>
-                  <button className="text-[8px] font-bold tracking-widest uppercase text-[#2D2D2D] hover:underline">Size Guide</button>
+                  <button className="text-[8px] font-bold tracking-widest uppercase text-[#2D2D2D] hover:underline">Panduan Ukuran</button>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {variantsForColor.map((variant) => {
@@ -420,10 +420,10 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
                 >
                   <ShoppingBag className="w-5 h-5" />
                   {!selectedColor || !selectedSize 
-                    ? 'Select Color & Size' 
+                    ? 'Pilih Warna & Ukuran' 
                     : currentVariant?.stock_quantity === 0 
-                      ? 'Out of Stock' 
-                      : 'Add to Cart'}
+                      ? 'Stok Habis' 
+                      : 'Masukkan ke Keranjang'}
                 </Button>
               </div>
 
@@ -431,15 +431,15 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
               <div className="grid grid-cols-3 gap-4 pt-4">
                 <div className="flex flex-col items-center text-center gap-2">
                   <Truck className="w-5 h-5 text-secondary" />
-                  <span className="text-[8px] font-bold tracking-widest uppercase opacity-60">Free Shipping</span>
+                  <span className="text-[8px] font-bold tracking-widest uppercase opacity-60">Gratis Ongkir</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-2">
                   <RotateCcw className="w-5 h-5 text-secondary" />
-                  <span className="text-[8px] font-bold tracking-widest uppercase opacity-60">30-Day Returns</span>
+                  <span className="text-[8px] font-bold tracking-widest uppercase opacity-60">Pengembalian 30 Hari</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-secondary" />
-                  <span className="text-[8px] font-bold tracking-widest uppercase opacity-60">Secure Payment</span>
+                  <span className="text-[8px] font-bold tracking-widest uppercase opacity-60">Pembayaran Aman</span>
                 </div>
               </div>
             </div>
@@ -450,8 +450,8 @@ export default function ProductDetailPage({ onAddToCart }: ProductDetailPageProp
         {recommendedProducts.length > 0 && (
           <section className="mt-32 pt-24 border-t border-primary/10">
             <div className="text-center mb-16 space-y-4">
-              <p className="text-[10px] font-bold tracking-[0.4em] text-secondary uppercase">Curated for you</p>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">RECOMMENDED FOR YOU</h2>
+              <p className="text-[10px] font-bold tracking-[0.4em] text-primary/60 uppercase">Dikurasi untuk Anda</p>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">REKOMENDASI UNTUK ANDA</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">

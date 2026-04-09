@@ -116,7 +116,7 @@ export default function Login() {
               AL-HAYAT
             </h1>
             <p className="text-[10px] font-bold tracking-[0.5em] uppercase opacity-80">
-              Management Suite
+              Suite Manajemen
             </p>
           </div>
           <div className="max-w-md">
@@ -124,7 +124,7 @@ export default function Login() {
               "Excellence is not an act, but a habit."
             </p>
             <p className="mt-8 text-[10px] font-bold tracking-widest uppercase opacity-50">
-              EST. 2026 — INTERNAL ACCESS ONLY
+              EST. 2026 — HANYA AKSES INTERNAL
             </p>
           </div>
         </div>
@@ -140,10 +140,10 @@ export default function Login() {
         >
           <div className="space-y-4">
             <h2 className="text-5xl font-serif font-bold tracking-tight text-primary">
-              Sign In
+              Masuk
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Enter your credentials to access the administrative dashboard.
+              Masukkan kredensial Anda untuk mengakses panel kontrol administratif.
             </p>
           </div>
 
@@ -152,7 +152,7 @@ export default function Login() {
               <div className="space-y-2">
                 <label className="text-[10px] font-bold tracking-widest uppercase text-primary/60 flex items-center gap-2">
                   <Mail className="w-3 h-3" />
-                  Email Address
+                  Alamat Email
                 </label>
                 <Input
                   {...register('email')}
@@ -173,13 +173,13 @@ export default function Login() {
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] font-bold tracking-widest uppercase text-primary/60 flex items-center gap-2">
                     <Lock className="w-3 h-3" />
-                    Password
+                    Kata Sandi
                   </label>
                   <a
                     href="#"
                     className="text-[10px] font-bold tracking-widest uppercase text-secondary hover:text-secondary/80 transition-colors"
                   >
-                    Forgot Password?
+                    Lupa Kata Sandi?
                   </a>
                 </div>
                 <Input
@@ -208,7 +208,7 @@ export default function Login() {
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   <>
-                    <span className="relative z-10">Authorize Access</span>
+                    <span className="relative z-10">Otorisasi Akses</span>
                     <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform relative z-10" />
                   </>
                 )}
@@ -220,14 +220,14 @@ export default function Login() {
                 disabled={isLoading}
                 className="w-full text-[10px] font-bold tracking-widest uppercase text-primary/40 hover:text-primary transition-colors py-2"
               >
-                {isLoading ? 'Processing...' : 'Seed Demo Admin Account'}
+                {isLoading ? 'Memproses...' : 'Buat Akun Admin Demo'}
               </button>
             </div>
           </form>
 
           <div className="pt-12 border-t border-primary/5">
             <p className="text-[10px] font-bold tracking-widest uppercase text-primary/30 text-center">
-              Secure SSL Encrypted Connection
+              Koneksi Terenkripsi SSL Aman
             </p>
           </div>
         </motion.div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Loader2, ChevronLeft, Layers, AlertTriangle, Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
@@ -17,6 +18,7 @@ import { toast } from 'sonner';
 import CategoryForm from './CategoryForm';
 
 export default function CategoryManager() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -59,7 +61,7 @@ export default function CategoryManager() {
 
     // Double check count before deleting
     if ((categoryToDelete.product_count || 0) > 0) {
-      toast.error('Cannot delete category: This category contains active products. Please reassign or delete the products first.', {
+      toast.error('Tidak dapat menghapus kategori: Kategori ini berisi produk aktif. Harap pindahkan atau hapus produk terlebih dahulu.', {
         className: 'bg-destructive text-destructive-foreground font-bold',
       });
       setCategoryToDelete(null);
@@ -91,11 +93,11 @@ export default function CategoryManager() {
 
       if (error) throw error;
       
-      toast.success('Category deleted');
+      toast.success('Kategori dihapus');
       setCategoryToDelete(null);
       fetchData();
     } catch (error: any) {
-      toast.error('Error deleting category: ' + error.message);
+      toast.error('Gagal menghapus kategori: ' + error.message);
     } finally {
       setIsDeleting(false);
     }
@@ -123,10 +125,10 @@ export default function CategoryManager() {
           </Button>
           <div className="space-y-1">
             <h2 className="text-3xl font-serif font-bold tracking-tight">
-              {editingCategory ? 'Edit Category' : 'New Category'}
+              {editingCategory ? 'Ubah Kategori' : 'Kategori Baru'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {editingCategory ? `Updating: ${editingCategory.name}` : 'Create a new product grouping.'}
+              {editingCategory ? `Memperbarui: ${editingCategory.name}` : 'Buat pengelompokan produk baru.'}
             </p>
           </div>
         </div>
@@ -151,15 +153,15 @@ export default function CategoryManager() {
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div className="space-y-2">
-          <h2 className="text-3xl font-serif font-bold tracking-tight">Categories</h2>
-          <p className="text-sm text-muted-foreground">Organize your catalog into logical groupings.</p>
+          <h2 className="text-3xl font-serif font-bold tracking-tight">Kategori</h2>
+          <p className="text-sm text-muted-foreground">Atur katalog Anda ke dalam pengelompokan yang logis.</p>
         </div>
         <Button 
           onClick={() => setIsAdding(true)}
-          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-hover hover:text-white transition-all duration-300"
+          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-primary hover:text-white transition-all duration-300"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add New Category
+          Tambah Kategori Baru
         </Button>
       </div>
 
@@ -167,12 +169,12 @@ export default function CategoryManager() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Name</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Nama</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Slug</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Products</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Description</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Created At</TableHead>
-              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Actions</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Produk</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Deskripsi</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Dibuat Pada</TableHead>
+              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -237,7 +239,7 @@ export default function CategoryManager() {
             {categories.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                  No categories found. Add your first category to get started.
+                  Kategori tidak ditemukan. Tambahkan kategori pertama Anda untuk memulai.
                 </TableCell>
               </TableRow>
             )}
@@ -253,11 +255,11 @@ export default function CategoryManager() {
               <AlertTriangle className="w-8 h-8 text-destructive" />
             </div>
             <DialogTitle className="text-3xl font-serif font-bold tracking-tight text-center">
-              Delete Category?
+              Hapus Kategori?
             </DialogTitle>
             <DialogDescription className="text-center text-muted-foreground leading-relaxed">
-              Are you sure you want to delete <span className="font-bold text-primary">"{categoryToDelete?.name}"</span>? 
-              This action cannot be undone.
+              Apakah Anda yakin ingin menghapus <span className="font-bold text-primary">"{categoryToDelete?.name}"</span>? 
+              Tindakan ini tidak dapat dibatalkan.
             </DialogDescription>
           </DialogHeader>
 
@@ -265,11 +267,11 @@ export default function CategoryManager() {
             <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-2xl space-y-2">
               <div className="flex items-center gap-2 text-destructive font-bold text-xs uppercase tracking-widest">
                 <Lock className="w-4 h-4" />
-                Action Blocked
+                Tindakan Diblokir
               </div>
               <p className="text-xs text-destructive/80 leading-relaxed">
-                This category contains <span className="font-bold">{categoryToDelete?.product_count} active products</span>. 
-                You must reassign or delete these products before this category can be removed.
+                Kategori ini berisi <span className="font-bold">{categoryToDelete?.product_count} produk aktif</span>. 
+                Anda harus memindahkan atau menghapus produk-produk ini sebelum kategori ini dapat dihapus.
               </p>
             </div>
           )}
@@ -280,7 +282,7 @@ export default function CategoryManager() {
               onClick={() => setCategoryToDelete(null)}
               className="flex-1 h-12 font-bold tracking-widest uppercase text-[10px] rounded-xl"
             >
-              Cancel
+              Batal
             </Button>
             <Button
               onClick={handleDeleteCategory}
@@ -291,7 +293,7 @@ export default function CategoryManager() {
               {isDeleting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                'Delete Category'
+                'Hapus Kategori'
               )}
             </Button>
           </DialogFooter>

@@ -30,7 +30,7 @@ export default function Success() {
             {t('common.order_success')}
           </h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
-            Your order has been placed successfully. We've sent a confirmation email with all the details.
+            Pesanan Anda telah berhasil dibuat. Kami telah mengirimkan email konfirmasi dengan semua detailnya.
           </p>
         </motion.div>
 
@@ -44,12 +44,12 @@ export default function Success() {
             className="h-16 px-12 bg-primary text-white font-bold tracking-[0.2em] uppercase hover:bg-primary/90 transition-all duration-300 group"
             onClick={() => navigate('/')}
           >
-            Return to Home
+            Kembali ke Beranda
             <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" />
           </Button>
           
           <p className="text-[10px] font-bold tracking-widest uppercase opacity-50">
-            Order ID: #ORD-{Math.floor(Math.random() * 1000000)}
+            ID Pesanan: #ORD-{Math.floor(Math.random() * 1000000)}
           </p>
         </motion.div>
       </div>

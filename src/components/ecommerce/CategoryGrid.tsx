@@ -44,7 +44,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
                   </p>
                   <div className="pt-6">
                     <Link to={`/category/${category.slug}`}>
-                      <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary transition-all duration-300 rounded-full h-12 px-8 font-bold tracking-widest text-[10px] uppercase">
+                      <Button className="bg-secondary text-primary hover:bg-primary hover:text-white transition-all duration-300 rounded-full h-12 px-8 font-bold tracking-widest text-[10px] uppercase border-none">
                         {t('common.explore')}
                         <ArrowRight className="w-4 h-4 ml-3" />
                       </Button>

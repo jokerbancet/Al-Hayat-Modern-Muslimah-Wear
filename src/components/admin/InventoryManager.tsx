@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Package, Image as ImageIcon, Loader2, ChevronLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
@@ -10,6 +11,7 @@ import { formatCurrency } from '../../lib/utils';
 import ProductForm from './ProductForm';
 
 export default function InventoryManager() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -70,7 +72,7 @@ export default function InventoryManager() {
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm(t('common.messages.are_you_sure'))) return;
     try {
       const { error } = await supabase
         .from('products')
@@ -79,10 +81,10 @@ export default function InventoryManager() {
 
       if (error) throw error;
       
-      toast.success('Product deleted');
+      toast.success('Produk dihapus');
       fetchData();
     } catch (error: any) {
-      toast.error('Error deleting product: ' + error.message);
+      toast.error('Gagal menghapus produk: ' + error.message);
     }
   };
 
@@ -112,10 +114,10 @@ export default function InventoryManager() {
           </Button>
           <div className="space-y-1">
             <h2 className="text-3xl font-serif font-bold tracking-tight">
-              {editingProduct ? 'Edit Product' : 'New Product'}
+              {editingProduct ? 'Ubah Produk' : 'Produk Baru'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {editingProduct ? `Updating: ${editingProduct.name}` : 'Fill in the details to create a new catalog item.'}
+              {editingProduct ? `Memperbarui: ${editingProduct.name}` : 'Isi detail untuk membuat item katalog baru.'}
             </p>
           </div>
         </div>
@@ -140,31 +142,31 @@ export default function InventoryManager() {
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div className="space-y-2">
-          <h2 className="text-3xl font-serif font-bold tracking-tight">Inventory Control</h2>
-          <p className="text-sm text-muted-foreground">Manage your products, stock levels, and variants.</p>
+          <h2 className="text-3xl font-serif font-bold tracking-tight">Kontrol Inventaris</h2>
+          <p className="text-sm text-muted-foreground">Kelola produk, tingkat stok, dan varian Anda.</p>
         </div>
         <Button 
           onClick={() => setIsAdding(true)}
-          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-hover hover:text-white transition-all duration-300"
+          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-primary hover:text-white transition-all duration-300"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add New Product
+          {t('admin.add_new_product')}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 border rounded-xl space-y-2">
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Products</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Produk</p>
           <p className="text-3xl font-serif font-bold">{products.length}</p>
         </div>
         <div className="bg-white p-6 border rounded-xl space-y-2">
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Low Stock Items</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Item Stok Rendah</p>
           <p className="text-3xl font-serif font-bold text-destructive">
             {products.filter(p => getTotalStock(p.variants) < 10).length}
           </p>
         </div>
         <div className="bg-white p-6 border rounded-xl space-y-2">
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Stock Value</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Nilai Stok</p>
           <p className="text-3xl font-serif font-bold">
             {formatCurrency(products.reduce((sum, p) => sum + (p.base_price * getTotalStock(p.variants)), 0))}
           </p>
@@ -175,12 +177,12 @@ export default function InventoryManager() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Product</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Category</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Price</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Stock</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Produk</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Kategori</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Harga</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Stok</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Status</TableHead>
-              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Actions</TableHead>
+              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -203,28 +205,28 @@ export default function InventoryManager() {
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="text-[10px] font-bold tracking-widest uppercase">
-                    {product.category?.name || 'Uncategorized'}
+                    {product.category?.name || 'Tanpa Kategori'}
                   </Badge>
                 </TableCell>
                 <TableCell className="font-medium">{formatCurrency(product.base_price)}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Package className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-sm">{getTotalStock(product.variants)} units</span>
+                    <span className="text-sm">{getTotalStock(product.variants)} unit</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   {getTotalStock(product.variants) === 0 ? (
                     <Badge className="bg-destructive/10 text-destructive border-none text-[10px] font-bold tracking-widest uppercase">
-                      Out of Stock
+                      Stok Habis
                     </Badge>
                   ) : getTotalStock(product.variants) < 10 ? (
                     <Badge className="bg-amber-100 text-amber-700 border-none text-[10px] font-bold tracking-widest uppercase">
-                      Low Stock
+                      Stok Rendah
                     </Badge>
                   ) : (
                     <Badge className="bg-sage text-primary border-none text-[10px] font-bold tracking-widest uppercase">
-                      In Stock
+                      Tersedia
                     </Badge>
                   )}
                 </TableCell>
@@ -253,7 +255,7 @@ export default function InventoryManager() {
             {products.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                  No products found. Add your first product to get started.
+                  Produk tidak ditemukan. Tambahkan produk pertama Anda untuk memulai.
                 </TableCell>
               </TableRow>
             )}

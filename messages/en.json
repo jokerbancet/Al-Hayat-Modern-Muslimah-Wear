@@ -1,5 +1,8 @@
 {
   "common": {
+    "home": "Home",
+    "category": "Category",
+    "best_seller": "Best Seller",
     "shop_now": "Shop Now",
     "add_to_cart": "Add to Cart",
     "size_guide": "Size Guide",
@@ -27,7 +30,39 @@
     "discover_essentials": "Discover our most-loved pieces, designed for effortless elegance and timeless appeal.",
     "discover_occasion": "For the moments that matter most. Intricate details and luxurious fabrics.",
     "discover_seasonal": "Breathable fabrics and contemporary designs for the shifting seasons.",
-    "explore": "Explore"
+    "explore": "Explore",
+    "quick_add": "Quick Add",
+    "detail_produk": "Product Detail",
+    "color": "Color",
+    "size": "Size",
+    "material": "Material",
+    "motif": "Motif",
+    "age_category": "Age Category",
+    "description": "Description",
+    "chat": "Chat",
+    "support": "Support",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "success": "Success",
+      "error": "Error",
+      "are_you_sure": "Are you sure?"
+    }
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "banners": "Banners",
+    "variants": "Variants",
+    "add_new_product": "Add New Product",
+    "stock_quantity": "Stock Quantity",
+    "price": "Price",
+    "upload_swatch": "Upload Swatch"
   },
   "categories": {
     "essentials": {

@@ -120,13 +120,13 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
           >
             <div className="space-y-4">
               <h1 className="text-5xl font-serif font-bold tracking-tight">{t('common.checkout')}</h1>
-              <p className="text-muted-foreground">Please enter your shipping and contact details.</p>
+              <p className="text-muted-foreground">Silakan masukkan detail pengiriman dan kontak Anda.</p>
             </div>
 
             <form onSubmit={handleCheckout} className="space-y-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-[10px] font-bold tracking-widest uppercase">First Name</Label>
+                  <Label htmlFor="firstName" className="text-[10px] font-bold tracking-widest uppercase">Nama Depan</Label>
                   <Input 
                     id="firstName" 
                     name="firstName"
@@ -137,7 +137,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-[10px] font-bold tracking-widest uppercase">Last Name</Label>
+                  <Label htmlFor="lastName" className="text-[10px] font-bold tracking-widest uppercase">Nama Belakang</Label>
                   <Input 
                     id="lastName" 
                     name="lastName"
@@ -151,7 +151,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[10px] font-bold tracking-widest uppercase">Email Address</Label>
+                  <Label htmlFor="email" className="text-[10px] font-bold tracking-widest uppercase">Alamat Email</Label>
                   <Input 
                     id="email" 
                     name="email"
@@ -163,7 +163,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-[10px] font-bold tracking-widest uppercase">Phone Number</Label>
+                  <Label htmlFor="phone" className="text-[10px] font-bold tracking-widest uppercase">Nomor Telepon</Label>
                   <Input 
                     id="phone" 
                     name="phone"
@@ -177,7 +177,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address" className="text-[10px] font-bold tracking-widest uppercase">Shipping Address</Label>
+                <Label htmlFor="address" className="text-[10px] font-bold tracking-widest uppercase">Alamat Pengiriman</Label>
                 <Input 
                   id="address" 
                   name="address"
@@ -190,7 +190,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="city" className="text-[10px] font-bold tracking-widest uppercase">City</Label>
+                  <Label htmlFor="city" className="text-[10px] font-bold tracking-widest uppercase">Kota</Label>
                   <Input 
                     id="city" 
                     name="city"
@@ -201,7 +201,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="postalCode" className="text-[10px] font-bold tracking-widest uppercase">Postal Code</Label>
+                  <Label htmlFor="postalCode" className="text-[10px] font-bold tracking-widest uppercase">Kode Pos</Label>
                   <Input 
                     id="postalCode" 
                     name="postalCode"
@@ -218,18 +218,18 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
                 disabled={isProcessing || !isLoaded}
                 className="w-full h-16 bg-primary text-white font-bold tracking-[0.2em] uppercase hover:bg-primary/90 transition-all duration-300"
               >
-                {isProcessing ? 'Processing...' : t('common.proceed_to_payment')}
+                {isProcessing ? 'Memproses...' : t('common.proceed_to_payment')}
               </Button>
             </form>
 
             <div className="flex items-center justify-center gap-8 pt-8 border-t opacity-50">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" />
-                <span className="text-[10px] font-bold tracking-widest uppercase">Secure SSL</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase">SSL Aman</span>
               </div>
               <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4" />
-                <span className="text-[10px] font-bold tracking-widest uppercase">Encrypted Payment</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase">Pembayaran Terenkripsi</span>
               </div>
             </div>
           </motion.div>
@@ -281,7 +281,7 @@ export default function Checkout({ items, onClearCart }: CheckoutProps) {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('common.shipping')}</span>
-                <span className="font-bold">Free</span>
+                <span className="font-bold">Gratis</span>
               </div>
               <div className="pt-4 flex justify-between items-center">
                 <span className="text-xl font-serif font-bold">{t('common.total')}</span>

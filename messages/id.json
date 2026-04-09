@@ -1,7 +1,10 @@
 {
   "common": {
-    "shop_now": "Beli Sekarang",
-    "add_to_cart": "Tambah ke Keranjang",
+    "home": "Beranda",
+    "category": "Kategori",
+    "best_seller": "Produk Terlaris",
+    "shop_now": "Belanja Sekarang",
+    "add_to_cart": "Masukkan ke Keranjang",
     "size_guide": "Panduan Ukuran",
     "checkout": "Checkout",
     "order_success": "Pesanan Berhasil",
@@ -27,7 +30,39 @@
     "discover_essentials": "Temukan koleksi favorit kami, dirancang untuk keanggunan tanpa usaha dan daya tarik abadi.",
     "discover_occasion": "Untuk momen yang paling berarti. Detail rumit dan kain mewah.",
     "discover_seasonal": "Kain yang sejuk dan desain kontemporer untuk perubahan musim.",
-    "explore": "Jelajahi"
+    "explore": "Jelajahi",
+    "quick_add": "Tambah Cepat",
+    "detail_produk": "Detail Produk",
+    "color": "Warna",
+    "size": "Ukuran",
+    "material": "Bahan",
+    "motif": "Motif",
+    "age_category": "Kategori Usia",
+    "description": "Deskripsi Produk",
+    "chat": "Obrolan",
+    "support": "Bantuan",
+    "actions": {
+      "edit": "Ubah",
+      "delete": "Hapus",
+      "save": "Simpan",
+      "cancel": "Batal"
+    },
+    "messages": {
+      "success": "Berhasil",
+      "error": "Terjadi Kesalahan",
+      "are_you_sure": "Apakah Anda yakin?"
+    }
+  },
+  "admin": {
+    "dashboard": "Panel Kontrol",
+    "products": "Produk",
+    "categories": "Kategori",
+    "banners": "Banner/Spanduk",
+    "variants": "Varian",
+    "add_new_product": "Tambah Produk Baru",
+    "stock_quantity": "Jumlah Stok",
+    "price": "Harga",
+    "upload_swatch": "Unggah Sampel Warna"
   },
   "categories": {
     "essentials": {

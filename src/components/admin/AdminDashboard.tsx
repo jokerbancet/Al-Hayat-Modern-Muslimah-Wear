@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { LayoutDashboard, Package, Image as ImageIcon, Settings, LogOut, ChevronRight, Menu, ShoppingBag, User, Ticket, Layers } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import InventoryManager from './InventoryManager';
 import OrderManager from './OrderManager';
@@ -11,15 +12,16 @@ import { useAuth } from '../../hooks/useAuth';
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('inventory');
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
 
   const sidebarLinks = [
-    { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
-    { id: 'banners', name: 'Banners', icon: ImageIcon },
-    { id: 'categories', name: 'Categories', icon: Layers },
-    { id: 'inventory', name: 'Inventory Control', icon: Package },
-    { id: 'orders', name: 'Orders', icon: ShoppingBag },
-    { id: 'vouchers', name: 'Vouchers', icon: Ticket },
-    { id: 'settings', name: 'Settings', icon: Settings },
+    { id: 'dashboard', name: t('admin.dashboard'), icon: LayoutDashboard },
+    { id: 'banners', name: t('admin.banners'), icon: ImageIcon },
+    { id: 'categories', name: t('admin.categories'), icon: Layers },
+    { id: 'inventory', name: t('admin.products'), icon: Package },
+    { id: 'orders', name: 'Pesanan', icon: ShoppingBag },
+    { id: 'vouchers', name: 'Voucher', icon: Ticket },
+    { id: 'settings', name: 'Pengaturan', icon: Settings },
   ];
 
   return (
@@ -28,7 +30,7 @@ export default function AdminDashboard() {
       <aside className="w-64 bg-white border-r hidden md:flex flex-col">
         <div className="p-8 border-b">
           <h1 className="text-2xl font-serif font-bold tracking-tighter">AL-HAYAT</h1>
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mt-2">Admin Panel</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mt-2">Panel Admin</p>
         </div>
         
         <div className="p-6 border-b bg-muted/10">
@@ -70,7 +72,7 @@ export default function AdminDashboard() {
             className="w-full justify-start gap-4 text-muted-foreground hover:text-destructive"
           >
             <LogOut className="w-5 h-5" />
-            <span className="text-xs font-bold tracking-widest uppercase">Sign Out</span>
+            <span className="text-xs font-bold tracking-widest uppercase">Keluar</span>
           </Button>
         </div>
       </aside>
@@ -89,8 +91,8 @@ export default function AdminDashboard() {
                 <LayoutDashboard className="w-8 h-8" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-3xl font-serif font-bold tracking-tight">Welcome back, {user?.email?.split('@')[0]}</h2>
-                <p className="text-sm text-muted-foreground">Your store is performing well. You have 12 new orders today.</p>
+                <h2 className="text-3xl font-serif font-bold tracking-tight">Selamat datang kembali, {user?.email?.split('@')[0]}</h2>
+                <p className="text-sm text-muted-foreground">Toko Anda berjalan dengan baik. Anda memiliki 12 pesanan baru hari ini.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl mt-8">
                 <Button 
@@ -98,21 +100,21 @@ export default function AdminDashboard() {
                   className="h-24 bg-white border border-primary/10 text-primary hover:bg-primary hover:text-white transition-all duration-500 flex flex-col gap-2 rounded-2xl shadow-sm"
                 >
                   <Package className="w-6 h-6" />
-                  <span className="text-[10px] font-bold tracking-widest uppercase">Add Product</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Tambah Produk</span>
                 </Button>
                 <Button 
                   onClick={() => setActiveTab('orders')}
                   className="h-24 bg-white border border-primary/10 text-primary hover:bg-primary hover:text-white transition-all duration-500 flex flex-col gap-2 rounded-2xl shadow-sm"
                 >
                   <ShoppingBag className="w-6 h-6" />
-                  <span className="text-[10px] font-bold tracking-widest uppercase">View Orders</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Lihat Pesanan</span>
                 </Button>
                 <Button 
                   onClick={() => setActiveTab('vouchers')}
                   className="h-24 bg-white border border-primary/10 text-primary hover:bg-primary hover:text-white transition-all duration-500 flex flex-col gap-2 rounded-2xl shadow-sm"
                 >
                   <Ticket className="w-6 h-6" />
-                  <span className="text-[10px] font-bold tracking-widest uppercase">New Voucher</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Voucher Baru</span>
                 </Button>
               </div>
             </div>
@@ -120,19 +122,19 @@ export default function AdminDashboard() {
           {activeTab === 'media' && (
             <div className="space-y-8">
               <div className="space-y-2">
-                <h2 className="text-3xl font-serif font-bold tracking-tight">Media Manager</h2>
-                <p className="text-sm text-muted-foreground">Drag and drop images to upload to your product gallery.</p>
+                <h2 className="text-3xl font-serif font-bold tracking-tight">Manajer Media</h2>
+                <p className="text-sm text-muted-foreground">Tarik dan lepas gambar untuk mengunggah ke galeri produk Anda.</p>
               </div>
               <div className="border-2 border-dashed border-primary/10 rounded-3xl h-96 flex flex-col items-center justify-center space-y-6 bg-white/50">
                 <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
                   <ImageIcon className="w-8 h-8" />
                 </div>
                 <div className="text-center space-y-2">
-                  <p className="font-bold text-sm">Drop your images here</p>
-                  <p className="text-xs text-muted-foreground">Supports JPG, PNG, WEBP up to 5MB</p>
+                  <p className="font-bold text-sm">Letakkan gambar Anda di sini</p>
+                  <p className="text-xs text-muted-foreground">Mendukung JPG, PNG, WEBP hingga 5MB</p>
                 </div>
-                <Button className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-hover hover:text-white transition-all duration-300">
-                  Browse Files
+                <Button className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-primary hover:text-white transition-all duration-300">
+                  Telusuri File
                 </Button>
               </div>
             </div>

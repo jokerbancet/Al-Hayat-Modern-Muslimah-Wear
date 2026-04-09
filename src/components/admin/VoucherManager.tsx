@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Ticket, Calendar, Percent, Banknote, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 import { formatCurrency } from '../../lib/utils';
 
 export default function VoucherManager() {
+  const { t } = useTranslation();
   const [vouchers, setVouchers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -98,17 +100,17 @@ export default function VoucherManager() {
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div className="space-y-2">
-          <h2 className="text-3xl font-serif font-bold tracking-tight">Voucher Management</h2>
-          <p className="text-sm text-muted-foreground">Create and manage discount codes for your customers.</p>
+          <h2 className="text-3xl font-serif font-bold tracking-tight">Manajemen Voucher</h2>
+          <p className="text-sm text-muted-foreground">Buat dan kelola kode diskon untuk pelanggan Anda.</p>
         </div>
         <Button 
           onClick={() => setIsAdding(!isAdding)}
-          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-hover hover:text-white transition-all duration-300"
+          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-primary hover:text-white transition-all duration-300"
         >
-          {isAdding ? 'Cancel' : (
+          {isAdding ? 'Batal' : (
             <>
               <Plus className="w-4 h-4 mr-2" />
-              Create Voucher
+              Buat Voucher
             </>
           )}
         </Button>
@@ -118,28 +120,28 @@ export default function VoucherManager() {
         <div className="bg-white p-8 border rounded-xl shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
           <form onSubmit={handleAddVoucher} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Voucher Code</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Kode Voucher</Label>
               <Input 
                 required
                 value={newVoucher.code}
                 onChange={(e) => setNewVoucher({ ...newVoucher, code: e.target.value.toUpperCase() })}
-                placeholder="e.g. WELCOME10" 
+                placeholder="misal: WELCOME10" 
                 className="h-12 font-mono"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Discount Type</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Tipe Diskon</Label>
               <select 
                 value={newVoucher.discount_type}
                 onChange={(e) => setNewVoucher({ ...newVoucher, discount_type: e.target.value })}
                 className="w-full h-12 px-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
               >
-                <option value="percentage">Percentage (%)</option>
-                <option value="fixed">Fixed Amount (IDR)</option>
+                <option value="percentage">Persentase (%)</option>
+                <option value="fixed">Jumlah Tetap (IDR)</option>
               </select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Discount Value</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Nilai Diskon</Label>
               <div className="relative">
                 <Input 
                   required
@@ -155,7 +157,7 @@ export default function VoucherManager() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Minimum Spend (IDR)</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Minimal Belanja (IDR)</Label>
               <Input 
                 type="number"
                 value={newVoucher.min_spend || ''}
@@ -165,18 +167,18 @@ export default function VoucherManager() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Usage Limit (Optional)</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Batas Penggunaan (Opsional)</Label>
               <Input 
                 type="number"
                 value={newVoucher.usage_limit || ''}
                 onChange={(e) => setNewVoucher({ ...newVoucher, usage_limit: e.target.value ? parseInt(e.target.value) : null })}
-                placeholder="Unlimited" 
+                placeholder="Tanpa Batas" 
                 className="h-12"
               />
             </div>
             <div className="md:col-span-2">
               <Button type="submit" className="w-full h-12 bg-primary text-white font-bold tracking-widest uppercase text-[10px]">
-                Create Voucher
+                Buat Voucher
               </Button>
             </div>
           </form>
@@ -187,12 +189,12 @@ export default function VoucherManager() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Code</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Discount</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Min. Spend</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Usage</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Kode</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Diskon</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Min. Belanja</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Penggunaan</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Status</TableHead>
-              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Actions</TableHead>
+              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -215,9 +217,9 @@ export default function VoucherManager() {
                 </TableCell>
                 <TableCell>
                   {voucher.is_active ? (
-                    <Badge className="bg-sage text-primary border-none text-[10px] font-bold tracking-widest uppercase">Active</Badge>
+                    <Badge className="bg-sage text-primary border-none text-[10px] font-bold tracking-widest uppercase">Aktif</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-[10px] font-bold tracking-widest uppercase">Inactive</Badge>
+                    <Badge variant="outline" className="text-[10px] font-bold tracking-widest uppercase">Tidak Aktif</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
@@ -235,7 +237,7 @@ export default function VoucherManager() {
             {vouchers.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                  No vouchers found.
+                  Voucher tidak ditemukan.
                 </TableCell>
               </TableRow>
             )}

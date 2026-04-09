@@ -116,12 +116,12 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <div className="bg-white p-8 border rounded-xl shadow-sm space-y-8">
-        <h3 className="text-xl font-serif font-bold border-b pb-4">Banner Configuration</h3>
+        <h3 className="text-xl font-serif font-bold border-b pb-4">Konfigurasi Banner</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Image Upload Section */}
           <div className="space-y-4">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Hero Image</Label>
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Gambar Hero</Label>
             <div className="relative aspect-[16/9] md:aspect-[4/5] bg-muted/30 rounded-2xl border-2 border-dashed border-primary/10 flex flex-col items-center justify-center overflow-hidden group transition-all hover:border-primary/30">
               {imageUrl ? (
                 <>
@@ -144,8 +144,8 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
                     {isUploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Upload className="w-6 h-6" />}
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold tracking-widest uppercase">Upload Hero Image</p>
-                    <p className="text-[8px] text-muted-foreground uppercase tracking-wider">High Resolution Recommended</p>
+                    <p className="text-[10px] font-bold tracking-widest uppercase">Unggah Gambar Hero</p>
+                    <p className="text-[8px] text-muted-foreground uppercase tracking-wider">Resolusi Tinggi Direkomendasikan</p>
                   </div>
                   <input 
                     type="file" 
@@ -163,16 +163,16 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
           <div className="md:col-span-2 space-y-6">
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
-                <Label className="text-[10px] font-bold tracking-widest uppercase">Main Title</Label>
-                <Input {...register('main_title')} placeholder="e.g. KOLEKSI TERBARU" className="h-12" />
+                <Label className="text-[10px] font-bold tracking-widest uppercase">Judul Utama</Label>
+                <Input {...register('main_title')} placeholder="misal: KOLEKSI TERBARU" className="h-12" />
                 {errors.main_title && <p className="text-xs text-destructive">{errors.main_title.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-bold tracking-widest uppercase">Sub Title</Label>
+                <Label className="text-[10px] font-bold tracking-widest uppercase">Sub Judul</Label>
                 <textarea 
                   {...register('sub_title')}
                   className="w-full min-h-[100px] p-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                  placeholder="Describe the collection..."
+                  placeholder="Deskripsikan koleksi ini..."
                 />
                 {errors.sub_title && <p className="text-xs text-destructive">{errors.sub_title.message}</p>}
               </div>
@@ -181,7 +181,7 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-[10px] font-bold tracking-widest uppercase">Show CTA Button</Label>
+                  <Label className="text-[10px] font-bold tracking-widest uppercase">Tampilkan Tombol CTA</Label>
                   <button
                     type="button"
                     onClick={() => setValue('show_button', !showButton)}
@@ -193,11 +193,11 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
                 {showButton && (
                   <div className="space-y-4 pt-2">
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold tracking-widest uppercase">Button Text</Label>
-                      <Input {...register('button_text')} placeholder="Shop Now" className="h-10" />
+                      <Label className="text-[10px] font-bold tracking-widest uppercase">Teks Tombol</Label>
+                      <Input {...register('button_text')} placeholder="Belanja Sekarang" className="h-10" />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold tracking-widest uppercase">Button Link</Label>
+                      <Label className="text-[10px] font-bold tracking-widest uppercase">Link Tombol</Label>
                       <Input {...register('button_link')} placeholder="/category/new-arrival" className="h-10" />
                     </div>
                   </div>
@@ -206,7 +206,7 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-[10px] font-bold tracking-widest uppercase">Is Active</Label>
+                  <Label className="text-[10px] font-bold tracking-widest uppercase">Aktif</Label>
                   <button
                     type="button"
                     onClick={() => setValue('is_active', !isActive)}
@@ -216,7 +216,7 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
                   </button>
                 </div>
                 <div className="space-y-2 pt-2">
-                  <Label className="text-[10px] font-bold tracking-widest uppercase">Display Order</Label>
+                  <Label className="text-[10px] font-bold tracking-widest uppercase">Urutan Tampilan</Label>
                   <Input 
                     type="number" 
                     {...register('display_order', { valueAsNumber: true })} 
@@ -231,7 +231,7 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
 
       <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" onClick={onCancel} className="h-12 px-8 font-bold tracking-widest uppercase text-[10px]">
-          Cancel
+          Batal
         </Button>
         <Button 
           type="submit" 
@@ -241,10 +241,10 @@ export default function BannerForm({ onSuccess, onCancel, initialData }: BannerF
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
+              Menyimpan...
             </>
           ) : (
-            initialData ? 'Update Banner' : 'Create Banner'
+            initialData ? 'Ubah Banner' : 'Buat Banner'
           )}
         </Button>
       </div>

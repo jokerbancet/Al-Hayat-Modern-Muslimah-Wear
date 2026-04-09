@@ -35,11 +35,11 @@ export default function OrderManager() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
-        return <Badge className="bg-sage text-primary border-none text-[10px] font-bold tracking-widest uppercase">Paid</Badge>;
+        return <Badge className="bg-sage text-primary border-none text-[10px] font-bold tracking-widest uppercase">Dibayar</Badge>;
       case 'pending':
-        return <Badge className="bg-gold text-primary border-none text-[10px] font-bold tracking-widest uppercase">Pending</Badge>;
+        return <Badge className="bg-gold text-primary border-none text-[10px] font-bold tracking-widest uppercase">Menunggu</Badge>;
       case 'cancelled':
-        return <Badge className="bg-destructive text-white border-none text-[10px] font-bold tracking-widest uppercase">Cancelled</Badge>;
+        return <Badge className="bg-destructive text-white border-none text-[10px] font-bold tracking-widest uppercase">Dibatalkan</Badge>;
       default:
         return <Badge variant="outline" className="text-[10px] font-bold tracking-widest uppercase">{status}</Badge>;
     }
@@ -48,21 +48,21 @@ export default function OrderManager() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h2 className="text-3xl font-serif font-bold tracking-tight">Order Management</h2>
-        <p className="text-sm text-muted-foreground">Monitor and process customer orders.</p>
+        <h2 className="text-3xl font-serif font-bold tracking-tight">Manajemen Pesanan</h2>
+        <p className="text-sm text-muted-foreground">Pantau dan proses pesanan pelanggan.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 border rounded-xl space-y-2">
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Orders</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Total Pesanan</p>
           <p className="text-3xl font-serif font-bold">{orders.length}</p>
         </div>
         <div className="bg-white p-6 border rounded-xl space-y-2">
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Pending Payments</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Pembayaran Tertunda</p>
           <p className="text-3xl font-serif font-bold text-gold">{orders.filter(o => o.status === 'pending').length}</p>
         </div>
         <div className="bg-white p-6 border rounded-xl space-y-2">
-          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Revenue</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Pendapatan</p>
           <p className="text-3xl font-serif font-bold text-sage">
             {formatCurrency(orders.filter(o => o.status === 'paid').reduce((sum, o) => sum + o.total_amount, 0))}
           </p>
@@ -73,22 +73,22 @@ export default function OrderManager() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Order ID</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Customer</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Date</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Amount</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">ID Pesanan</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Pelanggan</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Tanggal</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Jumlah</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Status</TableHead>
-              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Actions</TableHead>
+              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">Loading orders...</TableCell>
+                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">Memuat pesanan...</TableCell>
               </TableRow>
             ) : orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">No orders found.</TableCell>
+                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">Pesanan tidak ditemukan.</TableCell>
               </TableRow>
             ) : (
               orders.map((order) => (
@@ -107,11 +107,11 @@ export default function OrderManager() {
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" className="hover:text-secondary" title="View Details">
+                      <Button variant="ghost" size="icon" className="hover:text-secondary" title="Lihat Detail">
                         <Eye className="w-4 h-4" />
                       </Button>
                       {order.status === 'pending' && (
-                        <Button variant="ghost" size="icon" className="hover:text-destructive" title="Cancel Order">
+                        <Button variant="ghost" size="icon" className="hover:text-destructive" title="Batalkan Pesanan">
                           <XCircle className="w-4 h-4" />
                         </Button>
                       )}

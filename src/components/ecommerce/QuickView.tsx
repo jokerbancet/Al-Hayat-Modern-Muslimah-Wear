@@ -175,7 +175,7 @@ export default function QuickView({ product, isOpen, onClose, onAddToCart }: Qui
                   </p>
                   <h2 className="text-3xl font-serif font-bold tracking-tight">{productName}</h2>
                 </div>
-                <p className="text-2xl font-serif font-bold text-secondary">{formatCurrency(product.base_price)}</p>
+                <p className="text-2xl font-serif font-bold text-primary">{formatCurrency(product.base_price)}</p>
               </div>
               
               <div className="flex flex-wrap gap-4 py-4 border-y border-muted">

@@ -290,30 +290,30 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
     <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-12">
       {/* Basic Info Section */}
       <div className="bg-white p-8 border rounded-xl shadow-sm space-y-6">
-        <h3 className="text-xl font-serif font-bold border-b pb-4">Basic Information</h3>
+        <h3 className="text-xl font-serif font-bold border-b pb-4">Informasi Dasar</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Product Name</Label>
-            <Input {...register('name')} placeholder="e.g. Luxury Silk Abaya" className="h-12" />
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Nama Produk</Label>
+            <Input {...register('name')} placeholder="misal: Abaya Sutra Mewah" className="h-12" />
             {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
           <div className="space-y-2">
             <Label className="text-[10px] font-bold tracking-widest uppercase">Slug</Label>
-            <Input {...register('slug')} placeholder="luxury-silk-abaya" className="h-12" />
+            <Input {...register('slug')} placeholder="abaya-sutra-mewah" className="h-12" />
             {errors.slug && <p className="text-xs text-destructive">{errors.slug.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Base Price (IDR)</Label>
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Harga Dasar (IDR)</Label>
             <Input type="number" {...register('base_price', { valueAsNumber: true })} className="h-12" />
             {errors.base_price && <p className="text-xs text-destructive">{errors.base_price.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Category</Label>
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Kategori</Label>
             <select 
               {...register('category_id')}
               className="w-full h-12 px-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
             >
-              <option value="">Select Category</option>
+              <option value="">Pilih Kategori</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
@@ -321,32 +321,32 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
             {errors.category_id && <p className="text-xs text-destructive">{errors.category_id.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Age Category</Label>
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Kategori Usia</Label>
             <select 
               {...register('age_category')}
               className="w-full h-12 px-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
             >
-              <option value="Adult">Adult</option>
-              <option value="Teen">Teen</option>
-              <option value="Kids">Kids</option>
+              <option value="Adult">Dewasa</option>
+              <option value="Teen">Remaja</option>
+              <option value="Kids">Anak-anak</option>
             </select>
           </div>
           <div className="space-y-2">
             <Label className="text-[10px] font-bold tracking-widest uppercase">Motif</Label>
-            <Input {...register('motif')} placeholder="e.g. Plain, Floral" className="h-12" />
+            <Input {...register('motif')} placeholder="misal: Polos, Bunga" className="h-12" />
             {errors.motif && <p className="text-xs text-destructive">{errors.motif.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Material</Label>
-            <Input {...register('material')} placeholder="e.g. Premium Silk" className="h-12" />
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Bahan</Label>
+            <Input {...register('material')} placeholder="misal: Sutra Premium" className="h-12" />
             {errors.material && <p className="text-xs text-destructive">{errors.material.message}</p>}
           </div>
           <div className="md:col-span-2 space-y-2">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Description</Label>
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Deskripsi</Label>
             <textarea 
               {...register('description')}
               className="w-full min-h-[120px] p-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-              placeholder="Tell the story of this product..."
+              placeholder="Ceritakan tentang produk ini..."
             />
             {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
           </div>
@@ -356,9 +356,9 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
       {/* Media Uploader Section */}
       <div className="bg-white p-8 border rounded-xl shadow-sm space-y-6">
         <div className="flex justify-between items-center border-b pb-4">
-          <h3 className="text-xl font-serif font-bold">Media Gallery</h3>
+          <h3 className="text-xl font-serif font-bold">Galeri Media</h3>
           <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-            {imageFields.length} / 10 Images (Min 1)
+            {imageFields.length} / 10 Gambar (Min 1)
           </span>
         </div>
         
@@ -367,11 +367,11 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
             <Input 
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="Paste image URL here..." 
+              placeholder="Tempel URL gambar di sini..." 
               className="h-12"
             />
             <Button type="button" onClick={addImage} className="h-12 px-6">
-              <Plus className="w-4 h-4 mr-2" /> Add
+              <Plus className="w-4 h-4 mr-2" /> Tambah
             </Button>
           </div>
           
@@ -392,7 +392,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                   <X className="w-3 h-3" />
                 </button>
                 <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] py-1 text-center font-bold uppercase tracking-widest">
-                  {index === 0 ? 'Primary' : `Image ${index + 1}`}
+                  {index === 0 ? 'Utama' : `Gambar ${index + 1}`}
                 </div>
               </div>
             ))}
@@ -404,7 +404,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                   <Upload className="w-6 h-6 mb-2" />
                 )}
                 <span className="text-[8px] font-bold uppercase tracking-widest">
-                  {isUploading ? 'Uploading...' : 'Upload Image'}
+                  {isUploading ? 'Mengunggah...' : 'Unggah Gambar'}
                 </span>
                 <input 
                   type="file" 
@@ -424,7 +424,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
       {/* Variant Manager Section */}
       <div className="bg-white p-8 border rounded-xl shadow-sm space-y-6">
         <div className="flex justify-between items-center border-b pb-4">
-          <h3 className="text-xl font-serif font-bold">Inventory Matrix</h3>
+          <h3 className="text-xl font-serif font-bold">Matriks Inventaris</h3>
           <Button 
             type="button" 
             variant="outline" 
@@ -435,7 +435,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
             })}
             className="h-10 text-[10px] font-bold tracking-widest uppercase"
           >
-            <Plus className="w-3 h-3 mr-2" /> Add Color
+            <Plus className="w-3 h-3 mr-2" /> Tambah Warna
           </Button>
         </div>
 
@@ -445,10 +445,10 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-bold tracking-widest uppercase">Color Name</Label>
+                    <Label className="text-[10px] font-bold tracking-widest uppercase">Nama Warna</Label>
                     <Input 
                       {...register(`color_variants.${index}.color_option`)} 
-                      placeholder="e.g. Midnight Blue" 
+                      placeholder="misal: Biru Tengah Malam" 
                       className="h-12" 
                     />
                     {errors.color_variants?.[index]?.color_option && (
@@ -456,7 +456,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-bold tracking-widest uppercase">Swatch Image URL</Label>
+                    <Label className="text-[10px] font-bold tracking-widest uppercase">URL Gambar Swatch</Label>
                     <Input 
                       {...register(`color_variants.${index}.color_swatch_url`)} 
                       placeholder="https://..." 
@@ -469,7 +469,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                 </div>
                 
                 <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-4 relative group">
-                  <Label className="text-[10px] font-bold tracking-widest uppercase mb-4">Swatch Preview</Label>
+                  <Label className="text-[10px] font-bold tracking-widest uppercase mb-4">Pratinjau Swatch</Label>
                   {watch(`color_variants.${index}.color_swatch_url`) ? (
                     <div className="w-24 h-24 rounded-lg border overflow-hidden shadow-sm relative">
                       <img 
@@ -509,13 +509,13 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                     </label>
                   )}
                   <p className="mt-2 text-[8px] font-bold uppercase tracking-widest text-muted-foreground">
-                    {isUploading ? 'Uploading...' : 'Click to Upload Swatch'}
+                    {isUploading ? 'Mengunggah...' : 'Klik untuk Unggah Swatch'}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <Label className="text-[10px] font-bold tracking-widest uppercase">Stock per Size</Label>
+                <Label className="text-[10px] font-bold tracking-widest uppercase">Stok per Ukuran</Label>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
                   {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
                     <div key={size} className="space-y-2">
@@ -537,7 +537,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
                   onClick={() => removeColor(index)}
                   className="h-10 text-destructive hover:bg-destructive/10 font-bold text-[10px] uppercase tracking-widest"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" /> Remove Color
+                  <Trash2 className="w-4 h-4 mr-2" /> Hapus Warna
                 </Button>
               </div>
             </div>
@@ -548,7 +548,7 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
 
       <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" onClick={onCancel} className="h-12 px-8 font-bold tracking-widest uppercase text-[10px]">
-          Cancel
+          Batal
         </Button>
         <Button 
           type="submit" 
@@ -558,10 +558,10 @@ export default function ProductForm({ onSuccess, onCancel, initialData }: Produc
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
+              Menyimpan...
             </>
           ) : (
-            initialData ? 'Update Product' : 'Create Product'
+            initialData ? 'Ubah Produk' : 'Buat Produk'
           )}
         </Button>
       </div>

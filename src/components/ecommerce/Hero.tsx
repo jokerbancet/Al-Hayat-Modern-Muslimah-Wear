@@ -61,7 +61,7 @@ export default function Hero() {
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-6xl md:text-9xl font-serif font-bold tracking-tighter leading-[0.85] mb-8">
             AL-HAYAT <br />
-            <span className="italic text-secondary">COLLECTION</span>
+            <span className="italic text-primary">{t('common.category').toUpperCase()}</span>
           </h1>
         </div>
       </section>
@@ -106,7 +106,7 @@ export default function Hero() {
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <p className="text-[10px] md:text-xs font-bold tracking-[0.5em] text-secondary uppercase mb-6">
+              <p className="text-[10px] md:text-xs font-bold tracking-[0.5em] text-primary uppercase mb-6">
                 {currentBanner.sub_title}
               </p>
               
@@ -119,9 +119,9 @@ export default function Hero() {
                 {currentBanner.show_button && (
                   <Button 
                     onClick={() => navigate(currentBanner.button_link || '/')}
-                    className="h-16 px-12 bg-secondary text-primary font-bold tracking-[0.2em] uppercase hover:bg-hover hover:text-white transition-all duration-300 group"
+                    className="h-16 px-12 bg-secondary text-primary font-bold tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all duration-300 group"
                   >
-                    {currentBanner.button_text || 'Shop Now'}
+                    {currentBanner.button_text || t('common.shop_now')}
                     <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" />
                   </Button>
                 )}

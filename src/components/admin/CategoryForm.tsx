@@ -127,12 +127,12 @@ export default function CategoryForm({ onSuccess, onCancel, initialData }: Categ
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <div className="bg-white p-8 border rounded-xl shadow-sm space-y-8">
-        <h3 className="text-xl font-serif font-bold border-b pb-4">Category Details</h3>
+        <h3 className="text-xl font-serif font-bold border-b pb-4">Detail Kategori</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Image Upload Section */}
           <div className="space-y-4">
-            <Label className="text-[10px] font-bold tracking-widest uppercase">Category Image</Label>
+            <Label className="text-[10px] font-bold tracking-widest uppercase">Gambar Kategori</Label>
             <div className="relative aspect-[4/5] bg-muted/30 rounded-2xl border-2 border-dashed border-primary/10 flex flex-col items-center justify-center overflow-hidden group transition-all hover:border-primary/30">
               {imageUrl ? (
                 <>
@@ -155,8 +155,8 @@ export default function CategoryForm({ onSuccess, onCancel, initialData }: Categ
                     {isUploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Upload className="w-6 h-6" />}
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold tracking-widest uppercase">Upload Image</p>
-                    <p className="text-[8px] text-muted-foreground uppercase tracking-wider">4:5 Aspect Ratio Recommended</p>
+                    <p className="text-[10px] font-bold tracking-widest uppercase">Unggah Gambar</p>
+                    <p className="text-[8px] text-muted-foreground uppercase tracking-wider">Rasio Aspek 4:5 Direkomendasikan</p>
                   </div>
                   <input 
                     type="file" 
@@ -174,8 +174,8 @@ export default function CategoryForm({ onSuccess, onCancel, initialData }: Categ
           <div className="md:col-span-2 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label className="text-[10px] font-bold tracking-widest uppercase">Category Name</Label>
-                <Input {...register('name')} placeholder="e.g. Abaya" className="h-12" />
+                <Label className="text-[10px] font-bold tracking-widest uppercase">Nama Kategori</Label>
+                <Input {...register('name')} placeholder="misal: Abaya" className="h-12" />
                 {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
               </div>
               <div className="space-y-2">
@@ -186,11 +186,11 @@ export default function CategoryForm({ onSuccess, onCancel, initialData }: Categ
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold tracking-widest uppercase">Description</Label>
+              <Label className="text-[10px] font-bold tracking-widest uppercase">Deskripsi</Label>
               <textarea 
                 {...register('description')}
                 className="w-full min-h-[150px] p-4 border rounded-md bg-transparent text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                placeholder="Describe this category..."
+                placeholder="Deskripsikan kategori ini..."
               />
               {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
             </div>
@@ -200,7 +200,7 @@ export default function CategoryForm({ onSuccess, onCancel, initialData }: Categ
 
       <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" onClick={onCancel} className="h-12 px-8 font-bold tracking-widest uppercase text-[10px]">
-          Cancel
+          Batal
         </Button>
         <Button 
           type="submit" 
@@ -210,10 +210,10 @@ export default function CategoryForm({ onSuccess, onCancel, initialData }: Categ
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
+              Menyimpan...
             </>
           ) : (
-            initialData ? 'Update Category' : 'Create Category'
+            initialData ? 'Ubah Kategori' : 'Buat Kategori'
           )}
         </Button>
       </div>

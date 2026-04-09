@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Loader2, ChevronLeft, ImageIcon, Eye, EyeOff, MoveVertical } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
@@ -9,6 +10,7 @@ import { toast } from 'sonner';
 import BannerForm from './BannerForm';
 
 export default function BannerManager() {
+  const { t } = useTranslation();
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -36,7 +38,7 @@ export default function BannerManager() {
   };
 
   const handleDeleteBanner = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this banner?')) return;
+    if (!confirm(t('common.messages.are_you_sure'))) return;
     try {
       const { error } = await supabase
         .from('hero_banners')
@@ -45,10 +47,10 @@ export default function BannerManager() {
 
       if (error) throw error;
       
-      toast.success('Banner deleted');
+      toast.success('Banner dihapus');
       fetchData();
     } catch (error: any) {
-      toast.error('Error deleting banner: ' + error.message);
+      toast.error('Gagal menghapus banner: ' + error.message);
     }
   };
 
@@ -88,10 +90,10 @@ export default function BannerManager() {
           </Button>
           <div className="space-y-1">
             <h2 className="text-3xl font-serif font-bold tracking-tight">
-              {editingBanner ? 'Edit Banner' : 'New Hero Banner'}
+              {editingBanner ? 'Ubah Banner' : 'Banner Hero Baru'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {editingBanner ? `Updating: ${editingBanner.main_title}` : 'Create a new hero section slide.'}
+              {editingBanner ? `Memperbarui: ${editingBanner.main_title}` : 'Buat slide bagian hero baru.'}
             </p>
           </div>
         </div>
@@ -116,15 +118,15 @@ export default function BannerManager() {
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div className="space-y-2">
-          <h2 className="text-3xl font-serif font-bold tracking-tight">Hero Banners</h2>
-          <p className="text-sm text-muted-foreground">Manage the image slider on your landing page.</p>
+          <h2 className="text-3xl font-serif font-bold tracking-tight">Banner Hero</h2>
+          <p className="text-sm text-muted-foreground">Kelola slider gambar di halaman beranda Anda.</p>
         </div>
         <Button 
           onClick={() => setIsAdding(true)}
-          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-hover hover:text-white transition-all duration-300"
+          className="bg-secondary text-primary font-bold tracking-widest text-[10px] uppercase h-12 px-8 hover:bg-primary hover:text-white transition-all duration-300"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add New Banner
+          Tambah Banner Baru
         </Button>
       </div>
 
@@ -133,11 +135,11 @@ export default function BannerManager() {
           <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead className="w-12"></TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Preview</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Content</TableHead>
-              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Order</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Pratinjau</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Konten</TableHead>
+              <TableHead className="font-bold tracking-widest uppercase text-[10px]">Urutan</TableHead>
               <TableHead className="font-bold tracking-widest uppercase text-[10px]">Status</TableHead>
-              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Actions</TableHead>
+              <TableHead className="text-right font-bold tracking-widest uppercase text-[10px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -170,12 +172,12 @@ export default function BannerManager() {
                     {banner.is_active ? (
                       <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-none flex items-center gap-1">
                         <Eye className="w-3 h-3" />
-                        Active
+                        Aktif
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="text-muted-foreground flex items-center gap-1">
                         <EyeOff className="w-3 h-3" />
-                        Inactive
+                        Tidak Aktif
                       </Badge>
                     )}
                   </button>
@@ -205,7 +207,7 @@ export default function BannerManager() {
             {banners.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                  No banners found. Add your first hero banner to get started.
+                  Banner tidak ditemukan. Tambahkan banner hero pertama Anda untuk memulai.
                 </TableCell>
               </TableRow>
             )}

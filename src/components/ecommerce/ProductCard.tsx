@@ -14,7 +14,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const productName = product.name;
   const totalStock = product.variants?.reduce((sum, v) => sum + v.stock_quantity, 0) || 0;
@@ -41,14 +41,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         
         {product.is_featured && !isOutOfStock && (
           <Badge className="absolute top-4 left-4 bg-secondary text-primary border-none font-semibold tracking-widest text-[10px] uppercase px-3 py-1">
-            Featured
+            {t('common.best_seller')}
           </Badge>
         )}
 
         {isOutOfStock && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
             <Badge className="bg-destructive text-white border-none font-bold tracking-widest text-xs uppercase px-4 py-2 rounded-none">
-              Out of Stock
+              Stok Habis
             </Badge>
           </div>
         )}
@@ -68,16 +68,16 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="pt-2">
-          <Button
-            variant="outline"
-            className="w-full h-10 border-primary text-primary font-bold tracking-widest uppercase text-[10px] rounded-none hover:bg-primary hover:text-white transition-all duration-300"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/category/${product.category?.slug || 'all'}/${product.slug}`);
-            }}
-          >
-            Detail Produk
-          </Button>
+            <Button
+              variant="outline"
+              className="w-full h-10 border-primary text-primary font-bold tracking-widest uppercase text-[10px] rounded-none hover:bg-primary hover:text-white transition-all duration-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/category/${product.category?.slug || 'all'}/${product.slug}`);
+              }}
+            >
+              {t('common.detail_produk')}
+            </Button>
         </div>
       </div>
     </motion.div>

@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useLocation, Navigate, Link } from 'react-r
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import Navbar from './components/layout/Navbar';
+import ScrollToTop from './components/layout/ScrollToTop';
 import Hero from './components/ecommerce/Hero';
 import CategoryGrid from './components/ecommerce/CategoryGrid';
 import ProductCard from './components/ecommerce/ProductCard';
@@ -119,7 +120,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background selection:bg-secondary selection:text-white">
+    <div className="min-h-screen bg-background selection:bg-secondary selection:text-primary">
+      <ScrollToTop />
       {!isAdminRoute && !isLoginPage && (
         <Navbar onCartClick={() => setIsCartOpen(true)} cartCount={cartItems.length} categories={categories} />
       )}
@@ -147,15 +149,15 @@ export default function App() {
                   <div className="container mx-auto px-6">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
                       <div className="space-y-4">
-                        <p className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase">
-                          {category.name} Collection
+                        <p className="text-[10px] font-bold tracking-[0.3em] text-primary/60 uppercase">
+                          {category.name} {t('common.category')}
                         </p>
                         <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tight leading-tight">
                           {category.name.split(' ')[0]} <span className="italic">{category.name.split(' ').slice(1).join(' ') || 'Edit'}</span>
                         </h2>
                       </div>
                       <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-                        {category.description || `Discover our exclusive ${category.name} collection, crafted with elegance and style.`}
+                        {category.description || `Temukan koleksi eksklusif ${category.name} kami, dibuat dengan keanggunan dan gaya.`}
                       </p>
                     </div>
 
@@ -193,7 +195,7 @@ export default function App() {
               <div className="md:col-span-2 space-y-8">
                 <h2 className="text-4xl font-serif font-bold tracking-tighter">AL-HAYAT</h2>
                 <p className="text-sm text-white/60 max-w-md leading-relaxed">
-                  Bringing a seamless and stylish shopping experience to life by combining bold aesthetics, clean layouts, and effortless usability to elevate the browsing journey.
+                  Menghadirkan pengalaman belanja yang lancar dan penuh gaya dengan memadukan estetika berani, tata letak bersih, dan kemudahan penggunaan untuk meningkatkan perjalanan belanja Anda.
                 </p>
                 <div className="flex gap-8">
                   <a href="#" className="text-[10px] font-bold tracking-widest uppercase hover:text-secondary transition-colors">Instagram</a>
@@ -203,34 +205,34 @@ export default function App() {
               </div>
               
               <div className="space-y-6">
-                <h4 className="text-[10px] font-bold tracking-widest uppercase text-secondary">Shop</h4>
+                <h4 className="text-[10px] font-bold tracking-widest uppercase text-secondary">{t('common.category')}</h4>
                 <div className="flex flex-col gap-4">
                   {categories.map(cat => (
                     <Link key={cat.id} to={`/category/${cat.slug}`} className="text-sm hover:text-secondary transition-colors">{cat.name}</Link>
                   ))}
-                  <a href="#size-guide" className="text-sm hover:text-secondary transition-colors">{t('nav.size_guide')}</a>
+                  <a href="#size-guide" className="text-sm hover:text-secondary transition-colors">{t('common.size_guide')}</a>
                 </div>
               </div>
 
               <div className="space-y-6">
-                <h4 className="text-[10px] font-bold tracking-widest uppercase text-secondary">Support</h4>
+                <h4 className="text-[10px] font-bold tracking-widest uppercase text-secondary">{t('common.support')}</h4>
                 <div className="flex flex-col gap-4">
-                  <a href="#" className="text-sm hover:text-secondary transition-colors">Contact Us</a>
-                  <a href="#" className="text-sm hover:text-secondary transition-colors">Shipping & Returns</a>
-                  <a href="#" className="text-sm hover:text-secondary transition-colors">Privacy Policy</a>
-                  <a href="#" className="text-sm hover:text-secondary transition-colors">Terms of Service</a>
+                  <a href="#" className="text-sm hover:text-secondary transition-colors">Hubungi Kami</a>
+                  <a href="#" className="text-sm hover:text-secondary transition-colors">Pengiriman & Pengembalian</a>
+                  <a href="#" className="text-sm hover:text-secondary transition-colors">Kebijakan Privasi</a>
+                  <a href="#" className="text-sm hover:text-secondary transition-colors">Syarat & Ketentuan</a>
                   <button 
                     onClick={() => navigate('/admin')}
                     className="text-sm text-left hover:text-secondary transition-colors opacity-30 hover:opacity-100"
                   >
-                    Admin Portal
+                    Portal Admin
                   </button>
                 </div>
               </div>
             </div>
             
             <div className="mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
-              <p className="text-[10px] font-bold tracking-widest uppercase opacity-50">© 2026 AL-HAYAT. All rights reserved.</p>
+              <p className="text-[10px] font-bold tracking-widest uppercase opacity-50">© 2026 AL-HAYAT. Hak cipta dilindungi undang-undang.</p>
               <div className="flex gap-8 opacity-50">
                 <span className="text-[10px] font-bold tracking-widest uppercase">Visa</span>
                 <span className="text-[10px] font-bold tracking-widest uppercase">Mastercard</span>
@@ -246,7 +248,7 @@ export default function App() {
           onClick={() => signOut()}
           className="fixed bottom-8 right-8 bg-primary text-white font-bold tracking-widest text-[10px] uppercase h-12 px-8 shadow-2xl z-50"
         >
-          Sign Out
+          Keluar
         </Button>
       )}
 

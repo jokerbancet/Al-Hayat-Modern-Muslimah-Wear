@@ -11,7 +11,7 @@ export default function SizeGuideSection() {
         <div className="flex flex-col md:flex-row gap-16 items-start">
           <div className="flex-1 space-y-8">
             <div className="space-y-4">
-              <p className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase">
+              <p className="text-[10px] font-bold tracking-[0.3em] text-primary/60 uppercase">
                 Find Your Perfect Fit
               </p>
               <h2 className="text-5xl md:text-6xl font-serif font-bold tracking-tight leading-tight">

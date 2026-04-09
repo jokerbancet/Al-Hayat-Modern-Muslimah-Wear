@@ -131,7 +131,7 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-[#FDFCFB] pt-32 pb-24"
+      className="min-h-screen bg-background pt-32 pb-24"
     >
       <div className="container mx-auto px-6">
         {/* Header */}
@@ -140,7 +140,7 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
             {category.name}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto italic">
-            {category.description || `A curated collection of ${category.name} for the modern wardrobe.`}
+            {category.description || `Koleksi pilihan ${category.name} untuk lemari pakaian modern.`}
           </p>
         </div>
 
@@ -167,13 +167,13 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
                   render={
                     <Button variant="ghost" size="sm" className="text-[10px] font-bold tracking-widest uppercase gap-2">
                       <Filter className="w-4 h-4" />
-                      Filters
+                      Filter
                     </Button>
                   }
                 />
                 <SheetContent side="left" className="w-full sm:w-[400px] p-0 bg-background border-none">
                   <SheetHeader className="p-8 border-b">
-                    <SheetTitle className="text-2xl font-serif font-bold tracking-tight">Filters</SheetTitle>
+                    <SheetTitle className="text-2xl font-serif font-bold tracking-tight">Filter</SheetTitle>
                   </SheetHeader>
                   <div className="p-8">
                     <FilterSidebar 
@@ -192,12 +192,12 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
 
           <div className="flex items-center gap-6">
             <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-              {filteredProducts.length} Products
+              {filteredProducts.length} Produk
             </span>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="text-[10px] font-bold tracking-widest uppercase flex items-center gap-2 text-primary hover:text-secondary transition-colors">
-                  Sort: {sortBy === 'newest' ? 'Newest' : sortBy === 'price-low' ? 'Price: Low to High' : 'Price: High to Low'}
+                  Urutkan: {sortBy === 'newest' ? 'Terbaru' : sortBy === 'price-low' ? 'Harga: Rendah ke Tinggi' : 'Harga: Tinggi ke Rendah'}
                   <ChevronDown className="w-3 h-3" />
                 </button>
               </DropdownMenu.Trigger>
@@ -207,19 +207,19 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
                     onClick={() => setSortBy('newest')}
                     className="text-[10px] font-bold tracking-widest uppercase p-3 hover:bg-muted rounded-lg cursor-pointer outline-none"
                   >
-                    Newest
+                    Terbaru
                   </DropdownMenu.Item>
                   <DropdownMenu.Item 
                     onClick={() => setSortBy('price-low')}
                     className="text-[10px] font-bold tracking-widest uppercase p-3 hover:bg-muted rounded-lg cursor-pointer outline-none"
                   >
-                    Price: Low to High
+                    Harga: Rendah ke Tinggi
                   </DropdownMenu.Item>
                   <DropdownMenu.Item 
                     onClick={() => setSortBy('price-high')}
                     className="text-[10px] font-bold tracking-widest uppercase p-3 hover:bg-muted rounded-lg cursor-pointer outline-none"
                   >
-                    Price: High to Low
+                    Harga: Tinggi ke Rendah
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
@@ -258,8 +258,8 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
             
             {filteredProducts.length === 0 && (
               <div className="text-center py-24 space-y-4">
-                <p className="text-xl font-serif font-bold">No products found</p>
-                <p className="text-sm text-muted-foreground">Try adjusting your filters to find what you're looking for.</p>
+                <p className="text-xl font-serif font-bold">Produk tidak ditemukan</p>
+                <p className="text-sm text-muted-foreground">Coba sesuaikan filter Anda untuk menemukan apa yang Anda cari.</p>
                 <Button 
                   variant="outline" 
                   onClick={() => {
@@ -268,7 +268,7 @@ export default function CategoryPage({ onAddToCart }: CategoryPageProps) {
                   }}
                   className="rounded-full"
                 >
-                  Clear All Filters
+                  Hapus Semua Filter
                 </Button>
               </div>
             )}
@@ -299,7 +299,7 @@ function FilterSidebar({
     <div className="space-y-12">
       {/* Availability */}
       <div className="space-y-6">
-        <h4 className="text-[10px] font-bold tracking-widest uppercase">Availability</h4>
+        <h4 className="text-[10px] font-bold tracking-widest uppercase">Ketersediaan</h4>
         <div className="space-y-4">
           <div className="flex items-center justify-between group cursor-pointer" onClick={() => toggleAvailability('in-stock')}>
             <div className="flex items-center gap-3">
@@ -311,7 +311,7 @@ function FilterSidebar({
                   <X className="w-3 h-3 text-white" />
                 </Checkbox.Indicator>
               </Checkbox.Root>
-              <span className="text-sm font-medium">In stock</span>
+              <span className="text-sm font-medium">Tersedia</span>
             </div>
             <span className="text-[10px] text-muted-foreground">({inStockCount})</span>
           </div>
@@ -325,7 +325,7 @@ function FilterSidebar({
                   <X className="w-3 h-3 text-white" />
                 </Checkbox.Indicator>
               </Checkbox.Root>
-              <span className="text-sm font-medium">Out of stock</span>
+              <span className="text-sm font-medium">Stok Habis</span>
             </div>
             <span className="text-[10px] text-muted-foreground">({outOfStockCount})</span>
           </div>
@@ -334,7 +334,7 @@ function FilterSidebar({
 
       {/* Price Range */}
       <div className="space-y-6">
-        <h4 className="text-[10px] font-bold tracking-widest uppercase">Price</h4>
+        <h4 className="text-[10px] font-bold tracking-widest uppercase">Harga</h4>
         <div className="px-2">
           <Slider.Root
             className="relative flex items-center select-none touch-none w-full h-5"
@@ -395,7 +395,7 @@ function ProductCard({ product, viewMode }: { product: Product; viewMode: 'grid'
           {totalStock === 0 && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <span className="text-[10px] font-bold tracking-widest uppercase text-white border border-white/20 px-4 py-2 rounded-full backdrop-blur-md">
-                Out of Stock
+                Stok Habis
               </span>
             </div>
           )}
@@ -439,7 +439,7 @@ function ProductCard({ product, viewMode }: { product: Product; viewMode: 'grid'
         {totalStock === 0 && (
           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
             <span className="text-[10px] font-bold tracking-widest uppercase text-white border border-white/20 px-4 py-2 rounded-full backdrop-blur-md">
-              Out of Stock
+              Stok Habis
             </span>
           </div>
         )}
