@@ -125,10 +125,6 @@ export default function Hero() {
                     <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" />
                   </Button>
                 )}
-                
-                <p className="text-sm md:text-base text-primary/70 max-w-xs leading-relaxed">
-                  Elevating the browsing journey with bold aesthetics and effortless usability.
-                </p>
               </div>
             </motion.div>
           </AnimatePresence>

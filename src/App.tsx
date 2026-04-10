@@ -243,15 +243,6 @@ export default function App() {
         </footer>
       )}
 
-      {isAdmin && isAdminRoute && (
-        <Button 
-          onClick={() => signOut()}
-          className="fixed bottom-8 right-8 bg-primary text-white font-bold tracking-widest text-[10px] uppercase h-12 px-8 shadow-2xl z-50"
-        >
-          Keluar
-        </Button>
-      )}
-
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
